@@ -3,6 +3,17 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
+    DeletionPolicy: Retain
+    Region: us-west-2
+  MyLifecycleConfiguration:
+    Type: AWS::S3::BucketLifecycleConfiguration
+    Properties:
+      Bucket: !Ref MyS3Bucket
+      LifecycleConfiguration:
+        Rules:
+          - Id: Retain3Days
+            Status: Enabled
+            ExpirationInDays: 3
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
