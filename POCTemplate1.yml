@@ -1,0 +1,28 @@
+Resources:
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: csm-match-mock-data-matched
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName
+      SecurityGroups:
+      - !Ref logical name of AWS::EC2::SecurityGroup resource
+      UserData:
+      #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y aws-cfn-bootstrap
+          yum install awscli -y
+          wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
+          wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
+          rscript CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd CSM%20Match%20Mock%20Data%2020230720%20164351.csv
+          current_date=$(date +"%Y.%m.%d")
+          current_time=$(date +"%H.%M.%S")
+          file_name_base="CSM MATCH Mock Data MATCHED"
+          file_name="${file_name_base}_${current_date}_${current_time}.csv"
+          aws s3 cp "$file_name" s3://csm-match-mock-data-matched/
+      InstanceType: m1.small
+      AvailabilityZone: us-east-1a
+      ImageId: ami-0ff8a91507f77f867
