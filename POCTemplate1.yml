@@ -1,5 +1,18 @@
+#Command to create stack:
+#aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --parameters ParameterKey=MyCsvFile,ParameterValue="file://path/to/your/csfile.csv" --region your-aws-region
+Parameters:
+  CSVFile:
+    Type: String
+    Description: Path to the csv file
 Resources:
-  MyS3Bucket:
+  InputS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: csm-match-mock-data
+    DeletionPolicy: Delete
+    Region: us-west-2
+
+  OutputS3:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
@@ -8,7 +21,7 @@ Resources:
   MyLifecycleConfiguration:
     Type: AWS::S3::BucketLifecycleConfiguration
     Properties:
-      Bucket: !Ref MyS3Bucket
+      Bucket: !Ref OutputS3
       LifecycleConfiguration:
         Rules:
           - Id: Retain3Days
@@ -34,6 +47,7 @@ Resources:
           file_name_base="CSM MATCH Mock Data MATCHED"
           file_name="${file_name_base}_${current_date}_${current_time}.csv"
           aws s3 cp "$file_name" s3://csm-match-mock-data-matched/
+          aws cloudformation delete-stack --stack-name POCTemplate1
       InstanceType: m1.small
       AvailabilityZone: us-east-1a
       ImageId: ami-0ff8a91507f77f867
