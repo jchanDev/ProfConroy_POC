@@ -1,8 +1,21 @@
-#Command to create stack:
-#aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --parameters ParameterKey=MyCsvFile,ParameterValue="file://path/to/your/csfile.csv" --region your-aws-region
+# following commands that local computer will have to run (in order)
+#1. Command to create stack:
+# aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --region us-west-2
+# 2. Command that will upload local csv file onto existing s3 bucket
+# aws s3 cp /path/to/your/csvfile.csv s3://your-existing-bucket-name/csvfile.csv
+
+# local computer will need credentials to run above
+
+# template plans:
+# 1. contains services that will run once and will stay; includes: output s3 bucket, security group, iam roles, input bucket
+# 2. contains services that will run everytime; includes: ec2 instance
+
+# to-do:
 #EC2 launch role
-#add a VPC
 #add a security group
+
+
+
 Parameters:
   CSVFile:
     Type: String
@@ -94,16 +107,14 @@ Resources:
   #   Value: !Ref PrivateSubnet
   # NATGatewayId:
   #   Value: !Ref MyNATGateway
-  # InputS3:
-  #   Type: AWS::S3::Bucket
-  #   Properties:
-  #     BucketName: csm-match-mock-data
-  #   DeletionPolicy: Delete
-  #   Region: us-west-2
+  
+  InputS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: csm-match-mock-data
+    DeletionPolicy: Delete
+    Region: us-west-2
 
-#make bucket name parameter that is random
-#1. creating things that stay. ouput bucket, security group, IAM role
-#2. creating things that go away. EC2 instance, input bucket, VPC
   OutputS3:
     Type: AWS::S3::Bucket
     Properties:
@@ -119,6 +130,10 @@ Resources:
           - Id: Retain3Days
             Status: Enabled
             ExpirationInDays: 3
+
+  # based on how many times we think the instance will have to run per quarter
+  # option 1: to have instance terminate each time so bash runs everytime
+  # option 2: find a way for instance to re-run userdata bash script w/o termination
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
@@ -138,6 +153,7 @@ Resources:
           #!/bin/bash -xe
           yum update -y aws-cfn-bootstrap
           yum install awscli -y
+          aws s3 cp 
           wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
           wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
           rscript CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd CSM%20Match%20Mock%20Data%2020230720%20164351.csv
