@@ -13,7 +13,10 @@
 # to-do:
 #EC2 launch role
 #add a security group
-
+#vpc and subnet id
+#service catalog vpc
+#multiple parameters
+#parameters use default or json file in CLI
 
 
 Parameters:
