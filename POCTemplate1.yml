@@ -1,5 +1,8 @@
 #Command to create stack:
 #aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --parameters ParameterKey=MyCsvFile,ParameterValue="file://path/to/your/csfile.csv" --region your-aws-region
+#EC2 launch role
+#add a VPC
+#add a security group
 Parameters:
   CSVFile:
     Type: String
@@ -11,7 +14,9 @@ Resources:
       BucketName: csm-match-mock-data
     DeletionPolicy: Delete
     Region: us-west-2
-
+#make bucket name parameter that is random
+#1. creating things that stay. ouput bucket, security group, IAM role
+#2. creating things that go away. EC2 instance, input bucket, VPC
   OutputS3:
     Type: AWS::S3::Bucket
     Properties:
@@ -35,6 +40,13 @@ Resources:
       - !Ref logical name of AWS::EC2::SecurityGroup resource
       UserData:
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
+      #add credential section for github
+      #need secrets manager
+      #IAM roles for EC2 instance secret manager
+      #IAM roles for EC2 instance S3
+      #IAM roles for S3 to grab from EC2 instance
+      #add statement to prevent delete of S3 bucket
+      #cloudwatch logs if error
         Fn::Base64: !Sub |
           #!/bin/bash -xe
           yum update -y aws-cfn-bootstrap
