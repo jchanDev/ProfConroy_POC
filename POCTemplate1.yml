@@ -8,12 +8,99 @@ Parameters:
     Type: String
     Description: Path to the csv file
 Resources:
-  InputS3:
-    Type: AWS::S3::Bucket
+  Vpc:
+    Type: AWS::EC2::VPC
     Properties:
-      BucketName: csm-match-mock-data
-    DeletionPolicy: Delete
-    Region: us-west-2
+      # ask about proper ip addy
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  
+  # do we need a transit gateway? 
+  #(allows you to interconnect multiple VPCs and VPN connections into a single gateway)
+  VpcGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.0.0/16
+      MapPublicIpOnLaunch: true
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVpc
+      CidrBlock: 10.0.0.0/16
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVpc
+
+  PrivateRouteToNAT:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref MyNATGateway
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+  
+  MyNATGatewayEIP:
+    Type: AWS::EC2::EIP
+
+  MyNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      AllocationId: !GetAtt MyNATGatewayEIP.AllocationId
+  
+  #Outputs:
+  # VpcId:
+  #   Value: !Ref MyVpc
+  # PublicSubnetId:
+  #   Value: !Ref PublicSubnet
+  # PrivateSubnetId:
+  #   Value: !Ref PrivateSubnet
+  # NATGatewayId:
+  #   Value: !Ref MyNATGateway
+  # InputS3:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     BucketName: csm-match-mock-data
+  #   DeletionPolicy: Delete
+  #   Region: us-west-2
+
 #make bucket name parameter that is random
 #1. creating things that stay. ouput bucket, security group, IAM role
 #2. creating things that go away. EC2 instance, input bucket, VPC
