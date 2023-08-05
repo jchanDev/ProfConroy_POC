@@ -136,12 +136,19 @@ Resources:
   # based on how many times we think the instance will have to run per quarter
   # option 1: to have instance terminate each time so bash runs everytime
   # option 2: find a way for instance to re-run userdata bash script w/o termination
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: My EC2 instance security group
+      VpcId: 'vpc-00b9bd3a6d70475f1'
+      # security group still needs to be completed!!
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
       KeyName: !Ref KeyName
-      SecurityGroups:
-      - !Ref logical name of AWS::EC2::SecurityGroup resource
+      SubnetId: 'subnet-09c627ce914a28786'
+      SecurityGroupIds:
+      - !Ref MySecurityGroup
       UserData:
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
       #add credential section for github
