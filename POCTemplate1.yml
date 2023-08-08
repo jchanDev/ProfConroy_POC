@@ -19,17 +19,18 @@
 #parameters use default or json file in CLI
 
 Resources:
-# bucket policies and iam roles
+  # Bucket policies and IAM roles
   InputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref Input-S3-Bucket-POC2023
-      Statement:
-        Action: s3:GetObject
-        Effect: Allow
-        Resource: !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
-        Principal:
-          Service: ec2.amazonaws.com
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
+            Principal:
+              Service: ec2.amazonaws.com
 
   EC2InstanceRole:
     Type: AWS::IAM::Role
@@ -54,17 +55,18 @@ Resources:
                 Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
 
   OutputS3BucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket: !Ref Output-S3-Bucket-POC2023
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Output-S3-Bucket-POC2023
+      PolicyDocument:
         Statement:
-          Action: s3:PutObject
-          Effect: Allow
-          Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
-          Principal:
-            Service: ec2.amazonaws.com
-  
-# s3 buckets (input and output)
+          - Action: s3:PutObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
+            Principal:
+              Service: ec2.amazonaws.com
+
+  # S3 buckets (input and output)
   Input-S3-Bucket-POC2023:
     Type: AWS::S3::Bucket
     Properties:
@@ -88,13 +90,3 @@ Resources:
           - Id: Retain3Days
             Status: Enabled
             ExpirationInDays: 3
-
-  # based on how many times we think the instance will have to run per quarter
-  # option 1: to have instance terminate each time so bash runs everytime
-  # option 2: find a way for instance to re-run userdata bash script w/o termination
-  MySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: My EC2 instance security group
-      VpcId: 'vpc-00b9bd3a6d70475f1'
-      # security group still needs to be completed!!
