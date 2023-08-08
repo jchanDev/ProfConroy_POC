@@ -23,12 +23,12 @@ Resources:
   InputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref Input-S3-Bucket-POC2023
+      Bucket: !Ref InputS3BucketPOC2023
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
+            Resource: !Sub arn:aws:s3:::${InputS3BucketPOC2023}/*
             Principal:
               Service: ec2.amazonaws.com
 
@@ -49,31 +49,31 @@ Resources:
               - Effect: Allow
                 Action: s3:GetObject
                 Resource:
-                  - !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
+                  - !Sub arn:aws:s3:::${InputS3BucketPOC2023}/*
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
+                Resource: !Sub arn:aws:s3:::${OutputS3BucketPOC2023}/*
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref Output-S3-Bucket-POC2023
+      Bucket: !Ref OutputS3BucketPOC2023
       PolicyDocument:
         Statement:
           - Action: s3:PutObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
+            Resource: !Sub arn:aws:s3:::${OutputS3BucketPOC2023}/*
             Principal:
               Service: ec2.amazonaws.com
 
   # S3 buckets (input and output)
-  Input-S3-Bucket-POC2023:
+  InputS3BucketPOC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data
     DeletionPolicy: Delete
 
-  Output-S3-Bucket-POC2023:
+  OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
@@ -82,7 +82,7 @@ Resources:
   MyLifecycleConfiguration:
     Type: AWS::S3::BucketLifecycleConfiguration
     Properties:
-      Bucket: !Ref Output-S3-Bucket-POC2023
+      Bucket: !Ref OutputS3BucketPOC2023
       LifecycleConfiguration:
         Rules:
           - Id: Retain3Days
