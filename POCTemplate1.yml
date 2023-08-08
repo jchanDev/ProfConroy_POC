@@ -83,3 +83,7 @@ Resources:
             Status: Enabled
             ExpirationInDays: 3
     DeletionPolicy: Retain
+
+Outputs:
+  EC2InstanceRoleArn:
+    Value: !GetAtt MyEC2InstanceRole.Arn
