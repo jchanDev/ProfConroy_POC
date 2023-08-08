@@ -14,7 +14,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - !ImportValue EC2InstanceRoleArn
+        - !Ref EC2InstanceRole
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
