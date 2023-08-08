@@ -4,10 +4,10 @@
   # option 1: to have instance terminate each time so bash runs everytime
   # option 2: find a way for instance to re-run userdata bash script w/o termination
 
-Parameters:
-  EC2InstanceRoleArn:
-    Type: String
-    Description: ARN of the EC2 instance IAM role
+# Parameters:
+#   EC2InstanceRoleArn:
+#     Type: String
+#     Description: ARN of the EC2 instance IAM role
 
 Resources:
   MySecurityGroup:
@@ -28,7 +28,7 @@ Resources:
       SubnetId: 'subnet-09c627ce914a28786'
       SecurityGroupIds:
       - !Ref MySecurityGroup
-      IamInstanceProfile: !Ref EC2InstanceRoleArn
+      IamInstanceProfile: !ImportValue EC2InstanceRoleArn
       UserData:
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
       #add credential section for github
@@ -55,7 +55,7 @@ Resources:
 
          
       InstanceType: m1.small
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: us-west-2a
       ImageId: ami-0fa77410ef95ac0bb
 
 
