@@ -1,0 +1,43 @@
+# stack with only ec2 instance
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName
+      SubnetId: 'subnet-09c627ce914a28786'
+      SecurityGroupIds:
+      - !Ref MySecurityGroup
+      UserData:
+      #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
+      #add credential section for github
+      #need secrets manager
+      #IAM roles for EC2 instance secret manager
+      #IAM roles for EC2 instance S3
+      #IAM roles for S3 to grab from EC2 instance
+      #add statement to prevent delete of S3 bucket
+      #cloudwatch logs if error
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y aws-cfn-bootstrap
+          yum install awscli -y
+          aws s3 cp 
+          wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
+          run_rscript() {
+            wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
+            Rscript CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd CSM%20Match%20Mock%20Data%2020230720%20164351.csv
+            current_date=$(date +"%Y.%m.%d")
+            current_time=$(date +"%H.%M.%S")
+            file_name_base="CSM MATCH Mock Data MATCHED"
+            file_name="${file_name_base}_${current_date}_${current_time}.csv"
+            if [[ ! -e "$file_name" ]]; then
+              run_rscript()
+            else
+              aws s3 cp "$file_name" s3://csm-match-mock-data-matched/
+              aws cloudformation delete-stack --stack-name POCTemplate1
+            fi
+          }
+          run_rscript()
+      InstanceType: m1.small
+      AvailabilityZone: us-east-1a
+      ImageId: ami-0ff8a91507f77f867

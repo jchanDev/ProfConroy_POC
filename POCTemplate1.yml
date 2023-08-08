@@ -18,11 +18,6 @@
 #multiple parameters
 #parameters use default or json file in CLI
 
-
-Parameters:
-  CSVFile:
-    Type: String
-    Description: Path to the csv file
 Resources:
   Vpc:
     Type: AWS::EC2::VPC
@@ -34,99 +29,70 @@ Resources:
   InternetGateway:
     Type: AWS::EC2::InternetGateway
   
-  # do we need a transit gateway? 
   #(allows you to interconnect multiple VPCs and VPN connections into a single gateway)
-  VpcGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref Vpc
-      InternetGatewayId: !Ref InternetGateway
-
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref Vpc
-      CidrBlock: 10.0.0.0/16
-      MapPublicIpOnLaunch: true
-
-  PrivateSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref MyVpc
-      CidrBlock: 10.0.0.0/16
-
-  PublicRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref Vpc
-
-  PublicRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-
-  PublicSubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnet
-      RouteTableId: !Ref PublicRouteTable
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref MyVpc
-
-  PrivateRouteToNAT:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref MyNATGateway
-
-  PrivateSubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet
-      RouteTableId: !Ref PrivateRouteTable
   
-  MyNATGatewayEIP:
-    Type: AWS::EC2::EIP
-
-  MyNATGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      SubnetId: !Ref PublicSubnet
-      AllocationId: !GetAtt MyNATGatewayEIP.AllocationId
-  
-  #Outputs:
-  # VpcId:
-  #   Value: !Ref MyVpc
-  # PublicSubnetId:
-  #   Value: !Ref PublicSubnet
-  # PrivateSubnetId:
-  #   Value: !Ref PrivateSubnet
-  # NATGatewayId:
-  #   Value: !Ref MyNATGateway
-  
-  InputS3:
+  Input-S3-Bucket-POC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data
     DeletionPolicy: Delete
     Region: us-west-2
 
-  OutputS3:
+  InputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Input-S3-Bucket-POC2023
+      Statement:
+        Action: s3:GetObject
+        Effect: Allow
+        Resource: !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
+        Principal:
+          Service: ec2.amazonaws.com
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2InstanceRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: EC2S3AccessPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  - !Sub arn:aws:s3:::${Input-S3-Bucket-POC2023}/*
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
+
+  Output-S3-Bucket-POC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
     DeletionPolicy: Retain
     Region: us-west-2
+
+  OutputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Output-S3-Bucket-POC2023
+      Statement:
+        Action: s3:PutObject
+        Effect: Allow
+        Resource: !Sub arn:aws:s3:::${Output-S3-Bucket-POC2023}/*
+        Principal:
+          Service: ec2.amazonaws.com
+  
   MyLifecycleConfiguration:
     Type: AWS::S3::BucketLifecycleConfiguration
     Properties:
-      Bucket: !Ref OutputS3
+      Bucket: !Ref Output-S3-Bucket-POC2023
       LifecycleConfiguration:
         Rules:
           - Id: Retain3Days
