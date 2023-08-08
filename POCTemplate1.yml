@@ -85,7 +85,7 @@ Resources:
     DeletionPolicy: Delete
 
 Outputs:
-  EC2InstanceRoleArn:
-    Value: !GetAtt EC2InstanceRole.RoleName
+  EC2InstanceRoleName:
+    Value: "EC2InstanceRole"
     Export:
       Name: EC2InstanceRoleName
