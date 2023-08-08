@@ -10,6 +10,11 @@
 #     Description: ARN of the EC2 instance IAM role
 
 Resources:
+  MyIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !ImportValue EC2InstanceRoleArn
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -28,7 +33,7 @@ Resources:
       SubnetId: 'subnet-09c627ce914a28786'
       SecurityGroupIds:
       - !Ref MySecurityGroup
-      IamInstanceProfile: !ImportValue EC2InstanceRoleArn
+      IamInstanceProfile: !Ref MyIAMInstanceProfile
       UserData:
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
       #add credential section for github
