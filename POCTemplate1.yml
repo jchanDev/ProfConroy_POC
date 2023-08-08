@@ -86,4 +86,4 @@ Resources:
 
 Outputs:
   EC2InstanceRoleArn:
-    Value: !GetAtt MyEC2InstanceRole.Arn
+    Value: !GetAtt EC2InstanceRole.Arn
