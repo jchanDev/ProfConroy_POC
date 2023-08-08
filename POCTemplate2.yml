@@ -54,7 +54,7 @@ Resources:
           fi
 
          
-      InstanceType: m1.small
+      InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-0fa77410ef95ac0bb
 
