@@ -61,7 +61,7 @@ Resources:
          
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
-      ImageId: ami-0fa77410ef95ac0bb
+      ImageId: ami-0684f441a1af91c83
 
 
       #  wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
