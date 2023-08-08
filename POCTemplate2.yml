@@ -13,7 +13,8 @@ Resources:
   MyIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      Roles: !Ref EC2InstanceRoleName
+      Roles: 
+        - !Ref EC2InstanceRoleName
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
