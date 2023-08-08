@@ -72,14 +72,12 @@ Resources:
     Properties:
       BucketName: csm-match-mock-data
     DeletionPolicy: Delete
-    Region: us-west-2
 
   Output-S3-Bucket-POC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
     DeletionPolicy: Retain
-    Region: us-west-2
 
   MyLifecycleConfiguration:
     Type: AWS::S3::BucketLifecycleConfiguration
