@@ -84,8 +84,8 @@ Resources:
       #       ExpirationInDays: 3
     DeletionPolicy: Delete
 
-Outputs:
-  EC2InstanceRoleName:
-    Value: "EC2InstanceRole"
-    Export:
-      Name: EC2InstanceRoleName
+# Outputs:
+#   EC2InstanceRoleName:
+#     Value: EC2InstanceRole
+#     Export:
+#       Name: EC2InstanceRoleName
