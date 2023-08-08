@@ -19,7 +19,7 @@ Resources:
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: !Ref KeyName
+     # KeyName: !Ref KeyName
       SubnetId: 'subnet-09c627ce914a28786'
       SecurityGroupIds:
       - !Ref MySecurityGroup
