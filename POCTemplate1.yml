@@ -36,6 +36,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: EC2InstanceRole
+      AvailabilityZone: us-west-2a
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
