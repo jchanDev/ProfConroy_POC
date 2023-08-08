@@ -78,12 +78,12 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
-      LifecycleConfiguration:
-        Rules:
-          - Id: Retain3Days
-            Status: Enabled
-            ExpirationInDays: 3
-    DeletionPolicy: Retain
+      # LifecycleConfiguration:
+      #   Rules:
+      #     - Id: Retain3Days
+      #       Status: Enabled
+      #       ExpirationInDays: 3
+    DeletionPolicy: Delete
 
 Outputs:
   EC2InstanceRoleArn:
