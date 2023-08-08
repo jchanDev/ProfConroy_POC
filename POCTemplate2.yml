@@ -55,7 +55,7 @@ Resources:
 
          
       InstanceType: m1.small
-      AvailabilityZone: us-west-2a
+      AvailabilityZone: us-west-2b
       ImageId: ami-0fa77410ef95ac0bb
 
 
