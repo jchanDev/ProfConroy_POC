@@ -19,18 +19,6 @@
 #parameters use default or json file in CLI
 
 Resources:
-  Vpc:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.0.0.0/16
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
-
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-  
-  #(allows you to interconnect multiple VPCs and VPN connections into a single gateway)
-  
   Input-S3-Bucket-POC2023:
     Type: AWS::S3::Bucket
     Properties:
