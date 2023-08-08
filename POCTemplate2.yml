@@ -48,14 +48,14 @@ Resources:
           yum update -y aws-cfn-bootstrap
           yum install awscli -y
           wget https://github.com/kpancha1/POC-test-file-R/blob/main/testfile.R
-          inputFile=$(aws s3 cp s3://InputS3BucketPOC2023/testfile.R -)
-          if [[ -n "$inputFile" ]]; then
+          output=$(Rscript testfile.R)
+          if [ "$output" == "Hello, World!" ]; then
             echo "File content:" > worked.txt
-            echo "$inputFile" >> worked.txt
-            aws s3 cp worked.txt s3://OutputS3BucketPOC2023/
+            echo "$output" >> worked.txt
+            aws s3 cp worked.txt s3://csm-match-mock-data-matched/
           else
             echo "Failed to retrieve file content." > error.txt
-            aws s3 cp error.txt s3://OutputS3BucketPOC2023/
+            aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
 
          
@@ -63,7 +63,7 @@ Resources:
       AvailabilityZone: us-west-2b
       ImageId: ami-0684f441a1af91c83
 
-
+    #inputFile=$(aws s3 cp s3://InputS3BucketPOC2023/testfile.R -)
       #  wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
       #     wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
       #     Rscript CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd CSM%20Match%20Mock%20Data%2020230720%20164351.csv
