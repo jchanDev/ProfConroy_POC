@@ -47,9 +47,9 @@ Resources:
           #!/bin/bash -xe
           yum update -y aws-cfn-bootstrap
           yum install awscli -y
-          wget https://github.com/kpancha1/POC-test-file-R/blob/main/testfile.R
+          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
           output=$(Rscript testfile.R)
-          if [ "$output" == "Hello, World!" ]; then
+          if [ "$output" == "Hello World!" ]; then
             echo "File content:" > worked.txt
             echo "$output" >> worked.txt
             aws s3 cp worked.txt s3://csm-match-mock-data-matched/
