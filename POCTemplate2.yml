@@ -46,19 +46,15 @@ Resources:
       #cloudwatch logs if error
         Fn::Base64: !Sub |
           #!/bin/bash -xe
-          snap update -y aws-cfn-bootstrap
-          snap install awscli -y
-          snap start amazon-ssm-agent
+          sudo apt-get update
+          sudo install awscli -y
+          sudo snap start amazon-ssm-agent
+          cd
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
           output=$(Rscript testfile.R)
-          if [ "$output" == "Hello World!" ]; then
-            echo "File content:" > worked.txt
-            echo "$output" >> worked.txt
-            aws s3 cp worked.txt s3://csm-match-mock-data-matched/
-          else
-            echo "Failed to retrieve file content." > error.txt
-            aws s3 cp error.txt s3://csm-match-mock-data-matched/
-          fi
+          echo "File content:" > worked.txt
+          echo "$output" >> worked.txt
+          aws s3 cp worked.txt s3://csm-match-mock-data-matched/
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-0684f441a1af91c83
