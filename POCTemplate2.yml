@@ -44,9 +44,12 @@ Resources:
       #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
-        #
+        #add time for file name
+        #see if his script works
+        #add secret manager fo github
+        #research new Rstudio AMI or ubuntu download R 
         Fn::Base64: !Sub |
-          #!/bin/bash -x
+          #!/bin/bash -xe
           sudo apt-get update
           sudo apt-get install awscli
           sudo snap start amazon-ssm-agent
