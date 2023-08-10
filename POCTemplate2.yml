@@ -22,7 +22,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: My EC2 instance security group
-      VpcId: 'vpc-00b9bd3a6d70475f1'
+      VpcId: vpc-00b9bd3a6d70475f1
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22  # SSH port for instance management
@@ -33,7 +33,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
      # KeyName: !Ref KeyName
-      SubnetId: 'subnet-09c627ce914a28786'
+      SubnetId: subnet-09c627ce914a28786
       SecurityGroupIds:
       - !Ref MySecurityGroup
       IamInstanceProfile: !Ref MyIAMInstanceProfile
