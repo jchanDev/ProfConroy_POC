@@ -35,7 +35,7 @@ Resources:
   EC2InstanceRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: EC2InstanceRole
+      RoleName: EC2-Instance-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -53,19 +53,6 @@ Resources:
               - Effect: Allow
                 Action: s3:PutObject
                 Resource: arn:aws:s3:::csm-match-mock-data-matched/*
-
-  OutputS3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref OutputS3BucketPOC2023
-      PolicyDocument:
-        Statement:
-          - Action: s3:PutObject
-            Effect: Allow
-            Resource: arn:aws:s3:::csm-match-mock-data-matched/*
-            Principal:
-              Service: ec2.amazonaws.com
-
   # S3 buckets (input and output)
   InputS3BucketPOC2023:
     Type: AWS::S3::Bucket

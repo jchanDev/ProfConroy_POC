@@ -15,8 +15,8 @@ Resources:
     InstanceProfileName: EC2InstanceProfile
     Properties:
       Roles: 
-        - 
-          Ref: "EC2InstanceRole"
+        - Ref: EC2-Instance-Role-POC-US-WEST-2
+        - Ref: AmazonSSMManagedInstanceCore
         #- !Ref EC2InstanceRoleName
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
