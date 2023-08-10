@@ -14,7 +14,8 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles: 
-        - Ref: EC2-Instance-Role-POC-US-WEST-2
+        - 
+        Ref: EC2-Instance-Role-POC-US-WEST-2
         #- !Ref EC2InstanceRoleName
 
   MySecurityGroup:
@@ -27,7 +28,7 @@ Resources:
           FromPort: 22  # SSH port for instance management
           ToPort: 22
           CidrIp: 10.226.19.192/26
-          
+
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
