@@ -3,18 +3,21 @@
 # based on how many times we think the instance will have to run per quarter
   # option 1: to have instance terminate each time so bash runs everytime
   # option 2: find a way for instance to re-run userdata bash script w/o termination
-
-Parameters:
-  EC2InstanceRoleName:
-    Type: String
-    Description: Name of the EC2 instance IAM role
+#EC2InstanceRole is the parameter input we want
+# Parameters:
+#   EC2InstanceRoleName:
+#     Type: String
+#     Description: Name of the EC2 instance IAM role
 
 Resources:
   MyIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
+    InstanceProfileName: EC2InstanceProfile
     Properties:
       Roles: 
-        - !Ref EC2InstanceRoleName
+        - 
+          Ref: "EC2InstanceRole"
+        #- !Ref EC2InstanceRoleName
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -45,8 +48,9 @@ Resources:
       #cloudwatch logs if error
         Fn::Base64: !Sub |
           #!/bin/bash -xe
-          yum update -y aws-cfn-bootstrap
-          yum install awscli -y
+          snap update -y aws-cfn-bootstrap
+          snap install awscli -y
+          snap start amazon-ssm-agent
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
           output=$(Rscript testfile.R)
           if [ "$output" == "Hello World!" ]; then
@@ -57,8 +61,6 @@ Resources:
             echo "Failed to retrieve file content." > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
-
-         
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-0684f441a1af91c83
