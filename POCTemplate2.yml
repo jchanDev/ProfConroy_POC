@@ -16,7 +16,6 @@ Resources:
     Properties:
       Roles: 
         - Ref: EC2-Instance-Role-POC-US-WEST-2
-        - Ref: AmazonSSMManagedInstanceCore
         #- !Ref EC2InstanceRoleName
 
   MySecurityGroup:
