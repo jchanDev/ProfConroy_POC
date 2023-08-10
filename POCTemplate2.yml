@@ -44,10 +44,11 @@ Resources:
       #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
+        
         Fn::Base64: !Sub |
           #!/bin/bash -xe
           sudo apt-get update
-          sudo install awscli -y
+          sudo install awscli
           sudo snap start amazon-ssm-agent
           cd
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
