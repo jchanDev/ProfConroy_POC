@@ -20,6 +20,18 @@
 
 Resources:
   # Bucket policies and IAM roles
+  InputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref InputS3BucketPOC2023
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: arn:aws:s3:::csm-match-mock-data/*
+            Principal:
+              Service: ec2.amazonaws.com
+
   EC2InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -37,11 +49,23 @@ Resources:
               - Effect: Allow
                 Action: s3:GetObject
                 Resource:
-                  - !Sub arn:aws:s3:::${InputS3BucketPOC2023}/*
+                  - arn:aws:s3:::csm-match-mock-data/*
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !Sub arn:aws:s3:::${OutputS3BucketPOC2023}/*
-        - PolicyName: AmazonSSMManagedInstanceCore
+                Resource: arn:aws:s3:::csm-match-mock-data-matched/*
+
+  OutputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref OutputS3BucketPOC2023
+      PolicyDocument:
+        Statement:
+          - Action: s3:PutObject
+            Effect: Allow
+            Resource: arn:aws:s3:::csm-match-mock-data-matched/*
+            Principal:
+              Service: ec2.amazonaws.com
+
   # S3 buckets (input and output)
   InputS3BucketPOC2023:
     Type: AWS::S3::Bucket
@@ -59,30 +83,6 @@ Resources:
       #       Status: Enabled
       #       ExpirationInDays: 3
     DeletionPolicy: Delete
-  InputS3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref InputS3BucketPOC2023
-      PolicyDocument:
-        Statement:
-          - Action: s3:GetObject
-            Effect: Allow
-            Resource: !Sub arn:aws:s3:::${InputS3BucketPOC2023}/*
-            Principal:
-              Service: ec2.amazonaws.com
-  OutputS3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref OutputS3BucketPOC2023
-      PolicyDocument:
-        Statement:
-          - Action: s3:PutObject
-            Effect: Allow
-            Resource: !Sub arn:aws:s3:::${OutputS3BucketPOC2023}/*
-            Principal:
-              Service: ec2.amazonaws.com
-
-  
 
 # Outputs:
 #   EC2InstanceRoleName:
