@@ -54,6 +54,9 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
         - PolicyName: EC2S3AccessPolicy
           PolicyDocument:
@@ -65,10 +68,6 @@ Resources:
               - Effect: Allow
                 Action: s3:PutObject
                 Resource: arn:aws:s3:::csm-match-mock-data-matched/*
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
                 
   # S3 buckets (input and output)
   InputS3BucketPOC2023:

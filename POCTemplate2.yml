@@ -12,7 +12,6 @@
 Resources:
   MyIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
-    InstanceProfileName: EC2InstanceProfile
     Properties:
       Roles: 
         - Ref: EC2-Instance-Role-POC-US-WEST-2
