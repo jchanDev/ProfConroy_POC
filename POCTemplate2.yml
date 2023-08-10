@@ -15,7 +15,7 @@ Resources:
     Properties:
       Roles: 
         - 
-        Ref: EC2-Instance-Role-POC-US-WEST-2
+          EC2-Instance-Role-POC-US-WEST-2
         #- !Ref EC2InstanceRoleName
 
   MySecurityGroup:
