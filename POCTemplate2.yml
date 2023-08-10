@@ -16,7 +16,6 @@ Resources:
       Roles: 
         - 
           EC2-Instance-Role-POC-US-WEST-2
-        #- !Ref EC2InstanceRoleName
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -32,7 +31,6 @@ Resources:
   MyInstance:
     Type: AWS::EC2::Instance
     Properties:
-     # KeyName: !Ref KeyName
       SubnetId: subnet-09c627ce914a28786
       SecurityGroupIds:
       - !Ref MySecurityGroup
