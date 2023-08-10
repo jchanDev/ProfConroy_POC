@@ -65,7 +65,6 @@ Resources:
               - Effect: Allow
                 Action: s3:PutObject
                 Resource: arn:aws:s3:::csm-match-mock-data-matched/*
-    Path: /
     ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
