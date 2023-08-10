@@ -44,13 +44,13 @@ Resources:
       #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
-        
+        #
         Fn::Base64: !Sub |
-          #!/bin/bash -xe
+          #!/bin/bash -x
           sudo apt-get update
-          sudo install awscli
+          sudo apt-get install awscli
           sudo snap start amazon-ssm-agent
-          cd
+          cd /tmp
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
           output=$(Rscript testfile.R)
           echo "File content:" > worked.txt
