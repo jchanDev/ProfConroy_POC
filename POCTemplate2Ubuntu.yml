@@ -52,8 +52,9 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -x
           sudo apt-get update
-          sudo apt-get install awscli
+          sudo apt install -y awscli
           sudo snap start amazon-ssm-agent
+          sudo apt-get install r-base r-base-dev -y
           cd /tmp
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
           output=$(Rscript testfile.R)
