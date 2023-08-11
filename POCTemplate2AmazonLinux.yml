@@ -54,6 +54,7 @@ Resources:
           sudo yum install aws-cli -y
           sudo systemctl start amazon-ssm-agent
           cd /tmp
+          sudo yum install R
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
           csvfilename=$(Rscript TEST_writecsv.R)
           if [ -f "/tmp/${csvfilename}" ]; then
