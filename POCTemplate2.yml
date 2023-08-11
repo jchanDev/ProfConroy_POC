@@ -54,46 +54,15 @@ Resources:
           sudo apt-get install awscli
           sudo snap start amazon-ssm-agent
           cd /tmp
-          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
-          output=$(Rscript testfile.R)
-          echo "File content:" > worked.txt
-          echo "$output" >> worked.txt
-          aws s3 cp worked.txt s3://csm-match-mock-data-matched/
+          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
+          if [ -f "/tmp/MockData_" ]; then
+            echo "CSV file exists in the directory."
+          else
+            echo "CSV file does not exist in the directory."
+          fi
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-0684f441a1af91c83
       Tags:
         - Key: Name
           Value: EC2-Instance-POC-us-west-2b
-
-  # bash script for TEST_writecsv.R
-    #!/bin/bash -x
-    sudo apt-get update
-    sudo apt-get install awscli
-    sudo snap start amazon-ssm-agent
-    cd /tmp
-    wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
-    if [ -f "/tmp/MockData_" ]; then
-      echo "CSV file exists in the directory."
-    else
-      echo "CSV file does not exist in the directory."
-    fi
-
-
-
-
-
-    #inputFile=$(aws s3 cp s3://InputS3BucketPOC2023/testfile.R -)
-      #  wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
-      #     wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
-      #     Rscript CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd CSM%20Match%20Mock%20Data%2020230720%20164351.csv
-      #     current_date=$(date +"%Y.%m.%d")
-      #     current_time=$(date +"%H.%M.%S")
-      #     file_name_base="CSM MATCH Mock Data MATCHED"
-      #     file_name="${file_name_base}_${current_date}_${current_time}.csv"
-      #     if [[ ! -e "$file_name" ]]; then
-      #       echo "error" > error.txt
-      #       aws s3 cp error.txt s3://csm-match-mock-data-matched/
-      #     else
-      #       aws s3 cp "$file_name" s3://csm-match-mock-data-matched/
-      #     fi
