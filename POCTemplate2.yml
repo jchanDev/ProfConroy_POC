@@ -55,7 +55,8 @@ Resources:
           sudo snap start amazon-ssm-agent
           cd /tmp
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
-          if [ -f "/tmp/MockData_" ]; then
+          csvfilename=$(Rscript TEST_writecsv.R)
+          if [ -f "/tmp/${csvfilename}" ]; then
             echo "CSV file exists in the directory."
           else
             echo "CSV file does not exist in the directory."
