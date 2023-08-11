@@ -57,9 +57,9 @@ Resources:
           sudo yum install R
           wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
           csvfilename=$(Rscript TEST_writecsv.R)
-          if [ -f "/tmp/${csvfilename}" ]; then
+          if [ -f "/tmp/$csvfilename" ]; then
             echo "CSV file exists in the directory."
-            aws s3 cp /tmp/${csvfilename} s3://csm-match-mock-data-matched/
+            aws s3 cp /tmp/$csvfilename s3://csm-match-mock-data-matched/
           else
             echo "File does not exist. Failed" > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
