@@ -5,7 +5,7 @@
   # option 2: find a way for instance to re-run userdata bash script w/o termination
 #EC2InstanceRole is the parameter input we want
 # Parameters:
-#   EC2InstanceRoleName:
+#   EC2InstanceRoleName:s
 #     Type: String
 #     Description: Name of the EC2 instance IAM role
 
@@ -44,10 +44,7 @@ Resources:
       #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
-        #add time for file name
-        #see if his script works
-        #add secret manager fo github
-        #research new Rstudio AMI or ubuntu download R(check time)
+        #
         Fn::Base64: !Sub |
           #!/bin/bash -x
           sudo apt-get update
@@ -65,23 +62,6 @@ Resources:
       Tags:
         - Key: Name
           Value: EC2-Instance-POC-us-west-2b
-
-  # bash script for TEST_writecsv.R
-    #!/bin/bash -x
-    sudo apt-get update
-    sudo apt-get install awscli
-    sudo snap start amazon-ssm-agent
-    cd /tmp
-    wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
-    if [ -f "/tmp/MockData_" ]; then
-      echo "CSV file exists in the directory."
-    else
-      echo "CSV file does not exist in the directory."
-    fi
-
-
-
-
 
     #inputFile=$(aws s3 cp s3://InputS3BucketPOC2023/testfile.R -)
       #  wget https://github.com/dconroybeam/CSM-Match/blob/e69c72947a5d55c09dd5dc9be6a802712831f3c6/Mock%20Data/CSM%20Match%20Mock%20Data%2020230720%20164351.csv
