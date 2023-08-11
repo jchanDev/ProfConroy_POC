@@ -35,7 +35,7 @@ Resources:
       SecurityGroupIds:
       - !Ref MySecurityGroup
       IamInstanceProfile: !Ref MyIAMInstanceProfile
-      UserData:
+      
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
       #add credential section for github
       #need secrets manager
@@ -48,22 +48,48 @@ Resources:
         #see if his script works
         #add secret manager fo github
         #research new Rstudio AMI or ubuntu download R(check time)
+      UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -x
           sudo apt-get update
           sudo apt-get install awscli
           sudo snap start amazon-ssm-agent
           cd /tmp
-          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
-          csvfilename=$(Rscript TEST_writecsv.R)
-          if [ -f "/tmp/${csvfilename}" ]; then
-            echo "CSV file exists in the directory."
-          else
-            echo "CSV file does not exist in the directory."
-          fi
+          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/testfile.R
+          output=$(Rscript testfile.R)
+          echo "File content:" > worked.txt
+          echo "$output" >> worked.txt
+          aws s3 cp worked.txt s3://csm-match-mock-data-matched/
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
-      ImageId: ami-0684f441a1af91c83
+      ImageId: ami-03f65b8614a860c29
+      #ImageId: ami-0684f441a1af91c83
       Tags:
         - Key: Name
           Value: EC2-Instance-POC-us-west-2b
+
+  #  #!/bin/bash -x
+  #         sudo yum update -y
+  #         sudo yum install -y awscli
+  #         sudo systemctl start amazon-ssm-agent
+  #         cd /tmp
+  #         wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
+  #         output=$(Rscript TEST_writecsv.R)
+  #         if [ -f "/tmp/${output}" ]; then
+  #           echo "CSV file exists in the directory."
+  #         else
+  #           echo "CSV file does not exist in the directory."
+  #         fi
+
+    #       #!/bin/bash -x
+    #       sudo apt-get update
+    #       sudo apt-get install awscli
+    #       sudo snap start amazon-ssm-agent
+    #       cd /tmp
+    #       wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
+    #       csvfilename=$(Rscript TEST_writecsv.R)
+    #       if [ -f "/tmp/${csvfilename}" ]; then
+    #         echo "CSV file exists in the directory."
+    #       else
+    #         echo "CSV file does not exist in the directory."
+    #       fi
