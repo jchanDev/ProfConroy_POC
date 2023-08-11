@@ -47,7 +47,7 @@ Resources:
         #add time for file name
         #see if his script works
         #add secret manager fo github
-        #research new Rstudio AMI or ubuntu download R 
+        #research new Rstudio AMI or ubuntu download R(check time)
         Fn::Base64: !Sub |
           #!/bin/bash -xe
           sudo apt-get update
