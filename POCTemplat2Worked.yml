@@ -5,7 +5,7 @@
   # option 2: find a way for instance to re-run userdata bash script w/o termination
 #EC2InstanceRole is the parameter input we want
 # Parameters:
-#   EC2InstanceRoleName:
+#   EC2InstanceRoleName:s
 #     Type: String
 #     Description: Name of the EC2 instance IAM role
 
@@ -44,10 +44,7 @@ Resources:
       #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
-        #add time for file name
-        #see if his script works
-        #add secret manager fo github
-        #research new Rstudio AMI or ubuntu download R(check time)
+        #
         Fn::Base64: !Sub |
           #!/bin/bash -x
           sudo apt-get update
