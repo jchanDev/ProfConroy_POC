@@ -39,15 +39,12 @@ Resources:
       #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
       #add credential section for github
       #need secrets manager
-      #IAM roles for EC2 instance secret manager
-      #IAM roles for EC2 instance S3
-      #IAM roles for S3 to grab from EC2 instance
       #add statement to prevent delete of S3 bucket
       #cloudwatch logs if error
-        #add time for file name
-        #see if his script works
-        #add secret manager fo github
-        #research new Rstudio AMI or ubuntu download R(check time)
+        #add secret manager fo github(add to role to talk to secret manager) use cli to get secret and then store in variable to pull github
+        #spot instances
+        #lambda to start run
+        #wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
         Fn::Base64: !Sub |
           #!/bin/bash -x
           sudo yum update -y
@@ -55,7 +52,8 @@ Resources:
           sudo systemctl start amazon-ssm-agent
           cd /tmp
           sudo yum install R
-          wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
+          github_access_token=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString|fromjson.JC_Github_Token' --output text)
+          wget --header $github_access_token https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
           csvfilename=$(Rscript TEST_writecsv.R)
           if [ -f "/tmp/${csvfilename}" ]; then
             echo "CSV file exists in the directory."
