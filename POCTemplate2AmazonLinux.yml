@@ -49,6 +49,7 @@ Resources:
           #!/bin/bash -x
           sudo yum update -y
           sudo yum install aws-cli -y
+          sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
           cd /tmp
           sudo yum install R
@@ -65,7 +66,7 @@ Resources:
           fi
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
-      ImageId: ami-0684f441a1af91c83
+      ImageId: ami-04e35eeae7a7c5883
       Tags:
         - Key: Name
           Value: EC2-Instance-POC-us-west-2b
