@@ -77,43 +77,43 @@ Resources:
                   - "secretsmanager:DescribeSecret"
                 Resource: "*"
 
-  LambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: Lambda-Execution-Role-POC-US-WEST-2
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LambdaS3toCFPolicy
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:ListBucket
-                Resource:
-                  - arn:aws:s3:::csm-match-mock-data
-                  - arn:aws:s3:::csm-match-mock-data/*
-              - Effect: Allow
-                Action:
-                  - cloudformation:CreateStack
-                  - cloudformation:UpdateStack
-                  - cloudformation:DeleteStack
-                Resource: '*'
+  # LambdaRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: Lambda-Execution-Role-POC-US-WEST-2
+  #     AssumeRolePolicyDocument:
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: LambdaS3toCFPolicy
+  #         PolicyDocument:
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:GetObject
+  #                 - s3:ListBucket
+  #               Resource:
+  #                 - arn:aws:s3:::csm-match-mock-data
+  #                 - arn:aws:s3:::csm-match-mock-data/*
+  #             - Effect: Allow
+  #               Action:
+  #                 - cloudformation:CreateStack
+  #                 - cloudformation:UpdateStack
+  #                 - cloudformation:DeleteStack
+  #               Resource: '*'
                 
-  MyLambdaFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        S3Bucket: !Ref InputS3BucketPOC2023
-        S3Key: my-lambda-function.zip # replace with whatever we put in input bucket to hold lambda func
-      Handler: POCLambda.lambda_handler
-      Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.8
+  # MyLambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Code:
+  #       S3Bucket: !Ref InputS3BucketPOC2023
+  #       S3Key: my-lambda-function.zip # replace with whatever we put in input bucket to hold lambda func
+  #     Handler: POCLambda.lambda_handler
+  #     Role: !GetAtt LambdaRole.Arn
+  #     Runtime: python3.8
 
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket; therefore
@@ -126,10 +126,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: 's3:ObjectCreated:*'
-            Function: !GetAtt MyLambdaFunction.Arn
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: 's3:ObjectCreated:*'
+      #       Function: !GetAtt MyLambdaFunction.Arn
       # LifecycleConfiguration:
       #   Rules:
       #     - Id: Retain3Days
