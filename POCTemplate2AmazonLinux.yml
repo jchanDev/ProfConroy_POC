@@ -3,11 +3,6 @@
 # based on how many times we think the instance will have to run per quarter
   # option 1: to have instance terminate each time so bash runs everytime
   # option 2: find a way for instance to re-run userdata bash script w/o termination
-#EC2InstanceRole is the parameter input we want
-# Parameters:
-#   EC2InstanceRoleName:
-#     Type: String
-#     Description: Name of the EC2 instance IAM role
 
 Resources:
   MyIAMInstanceProfile:
