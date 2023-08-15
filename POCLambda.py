@@ -1,5 +1,3 @@
-# NOT FINISHED
-
 import boto3
 
 def lambda_handler(event, context):
@@ -9,21 +7,13 @@ def lambda_handler(event, context):
     object_key = s3_event['object']['key']
 
     # Specify the CloudFormation template URL
-    cloudformation_template_url = "https://<your-template-bucket>.s3.amazonaws.com/<template-file>.yaml"
+    cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
 
     # Launch CloudFormation stack
     cloudformation_client = boto3.client('cloudformation')
     response = cloudformation_client.create_stack(
-        StackName='MyStack',
+        StackName='POCTemplate2AmazonLinux',
         TemplateURL=cloudformation_template_url,
-        Parameters=[
-            # Define parameters if needed
-            {
-                'ParameterKey': 'ParameterName',
-                'ParameterValue': 'ParameterValue'
-            },
-        ],
-        Capabilities=['CAPABILITY_NAMED_IAM'],  # Add capabilities if required
     )
 
     return {
