@@ -47,12 +47,12 @@ Resources:
         #wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
         Fn::Base64: !Sub |
           #!/bin/bash -x
+          cd /tmp
           sudo yum update -y
           sudo yum install aws-cli -y
           sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
-          cd /tmp
-          sudo yum install R
+          sudo yum install R -y
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
           wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
