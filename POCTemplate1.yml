@@ -109,8 +109,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !Ref InputS3BucketPOC2023
-        S3Key: my-lambda-function.zip # replace with whatever we put in input bucket to hold lambda func
+        S3Bucket: lambda-store-bucket-poc-2023
+        S3Key: POCLambda.zip # replace with whatever we put in input bucket to hold lambda func
       Handler: POCLambda.lambda_handler
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.8
@@ -120,7 +120,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data
-    DeletionPolicy: Delete
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
@@ -135,11 +134,3 @@ Resources:
       #     - Id: Retain3Days
       #       Status: Enabled
       #       ExpirationInDays: 3
-    DeletionPolicy: Delete
-    
-
-# Outputs:
-#   EC2InstanceRoleName:
-#     Value: EC2InstanceRole
-#     Export:
-#       Name: EC2InstanceRoleName
