@@ -7,7 +7,7 @@ def lambda_handler(event, context):
     object_key = s3_event['object']['key']
 
     # Specify the CloudFormation template URL
-    cloudformation_template_url = "https://Lambda-Store-Bucket-POC-2023.s3.amazonaws.com/POCTemplate2AmazonLinux.yaml"
+    cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
 
     # Launch CloudFormation stack
     cloudformation_client = boto3.client('cloudformation')
