@@ -64,6 +64,15 @@ Resources:
             echo "File does not exist. Failed" > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
+       InstanceMarketOptions:
+        MarketType: spot
+        SpotOptions:
+          SpotInstanceType: "persistent"
+          InstanceInterruptionBehavior: "stop"
+          AllocationStrategy: "diversified"  # Choose "diversified" or "lowest-price"
+          BlockDurationMinutes: 30  # Specify the block duration in minutes
+          TimeoutAction: "terminate"  # Choose "terminate" or "hibernate"
+          TimeoutDurationMinutes: 30  # Specify the timeout duration in minutes
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-04e35eeae7a7c5883
