@@ -48,10 +48,8 @@ Resources:
           sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
           sudo yum install R -y
-        # using secrets manager
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
-        # pulling R model from priv github
           wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
         # pulling inputted csv file from s3 bucket
         #  aws s3 cp "s3://csm-match-mock-data/mock_data.csv" /tmp
@@ -63,15 +61,6 @@ Resources:
             echo "File does not exist. Failed" > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
-       InstanceMarketOptions:
-        MarketType: spot
-        SpotOptions:
-          SpotInstanceType: "persistent"
-          InstanceInterruptionBehavior: "stop"
-          AllocationStrategy: "diversified"  # Choose "diversified" or "lowest-price"
-          BlockDurationMinutes: 30  # Specify the block duration in minutes
-          TimeoutAction: "terminate"  # Choose "terminate" or "hibernate"
-          TimeoutDurationMinutes: 30  # Specify the timeout duration in minutes
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
       ImageId: ami-04e35eeae7a7c5883

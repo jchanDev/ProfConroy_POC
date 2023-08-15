@@ -77,33 +77,33 @@ Resources:
                   - "secretsmanager:DescribeSecret"
                 Resource: "*"
 
-  LambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: Lambda-Execution-Role-POC-US-WEST-2
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LambdaS3toCFPolicy
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:ListBucket
-                Resource:
-                  - arn:aws:s3:::csm-match-mock-data
-                  - arn:aws:s3:::csm-match-mock-data/*
-              - Effect: Allow
-                Action:
-                  - cloudformation:CreateStack
-                  - cloudformation:UpdateStack
-                  - cloudformation:DeleteStack
-                Resource: '*'
+  # LambdaRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: Lambda-Execution-Role-POC-US-WEST-2
+  #     AssumeRolePolicyDocument:
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: lambda.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: LambdaS3toCFPolicy
+  #         PolicyDocument:
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:GetObject
+  #                 - s3:ListBucket
+  #               Resource:
+  #                 - arn:aws:s3:::csm-match-mock-data
+  #                 - arn:aws:s3:::csm-match-mock-data/*
+  #             - Effect: Allow
+  #               Action:
+  #                 - cloudformation:CreateStack
+  #                 - cloudformation:UpdateStack
+  #                 - cloudformation:DeleteStack
+  #               Resource: '*'
                 
   MyLambdaFunction:
     Type: AWS::Lambda::Function
@@ -125,10 +125,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: 's3:ObjectCreated:*'
-            Function: !GetAtt MyLambdaFunction.Arn
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: 's3:ObjectCreated:*'
+      #       Function: !GetAtt MyLambdaFunction.Arn
       # LifecycleConfiguration:
       #   Rules:
       #     - Id: Retain3Days
