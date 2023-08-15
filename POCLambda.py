@@ -12,16 +12,8 @@ def lambda_handler(event, context):
     # Launch CloudFormation stack
     cloudformation_client = boto3.client('cloudformation')
     response = cloudformation_client.create_stack(
-        StackName='MyStack',
+        StackName='POCTemplate2AmazonLinux',
         TemplateURL=cloudformation_template_url,
-        Parameters=[
-            # Define parameters if needed
-            {
-                'ParameterKey': 'ParameterName',
-                'ParameterValue': 'ParameterValue'
-            },
-        ],
-        Capabilities=['CAPABILITY_NAMED_IAM'],  # Add capabilities if required
     )
 
     return {
