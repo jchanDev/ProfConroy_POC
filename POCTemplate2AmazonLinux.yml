@@ -42,14 +42,16 @@ Resources:
         #wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
         Fn::Base64: !Sub |
           #!/bin/bash -x
+          cd /tmp
           sudo yum update -y
           sudo yum install aws-cli -y
+          sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
-          cd /tmp
-          sudo yum install R
-          github_access_token=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString|fromjson.JC_Github_Token' --output text)
-          wget --header $github_access_token https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
-          csvfilename=$(Rscript TEST_writecsv.R)
+          sudo yum install R -y
+          secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
+          github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
+          wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
+          csvfilename=$(Rscript privateTest1.R)
           if [ -f "/tmp/$csvfilename" ]; then
             echo "CSV file exists in the directory."
             aws s3 cp /tmp/$csvfilename s3://csm-match-mock-data-matched/
@@ -59,7 +61,7 @@ Resources:
           fi
       InstanceType: t3.micro
       AvailabilityZone: us-west-2b
-      ImageId: ami-0684f441a1af91c83
+      ImageId: ami-04e35eeae7a7c5883
       Tags:
         - Key: Name
           Value: EC2-Instance-POC-us-west-2b
