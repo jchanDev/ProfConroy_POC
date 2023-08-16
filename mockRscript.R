@@ -146,7 +146,7 @@ dataMatched<-mateChoice(data)
 
 #Timestamp the filename:
 
-path<-"/ProfConroy_POC"
+path<-""
 
 format<-".csv"
 date<-format(Sys.time(),format="%Y%m%d %H%M%S")
