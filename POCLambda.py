@@ -1,6 +1,7 @@
 import boto3
 
 def lambda_handler(event, context):
+    
     try:
         # Parse event data
         s3_event = event['Records'][0]['s3']
@@ -21,8 +22,22 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': 'Stack creation initiated'
         }
+    
     except Exception as e:
+        s3 = boto3.client('s3')
+
+        # Specify the S3 bucket and file path
+        bucket_name = 'csm-match-mock-data-matched'
+        file_key = 'error_log.txt'
+
+        # Create the error message
+        error_message = f"Error: {str(e)}"
+
+        # Upload the error message as a text file to S3
+        s3.put_object(Bucket=bucket_name, Key=file_key, Body=error_message)
+
+        # Return a response indicating failure
         return {
             'statusCode': 500,
-            'body': f'Error: {str(e)}'
+            'body': 'An error occurred'
         }
