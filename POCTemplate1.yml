@@ -112,17 +112,13 @@ Resources:
               - Effect: Allow
                 Action: s3:PutObject
                 Resource:
-                  - arn:aws:s3:::csm-match-mock-data-matched
+                  - arn:aws:s3:::csm-match-mock-data-matched/*
 
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Function: !GetAtt MyLambdaFunction.Arn
-            Event: "s3:ObjectCreated:*"
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
@@ -150,7 +146,7 @@ Resources:
               # Launch CloudFormation stack
               cloudformation_client = boto3.client('cloudformation')
               response = cloudformation_client.create_stack(
-                  StackName='POCTemplate2AmazonLinux',
+                  StackName='POCTemplate2AmazonLinux.yml',
                   TemplateURL=cloudformation_template_url,
               )
 
@@ -162,34 +158,6 @@ Resources:
       Handler: POCLambda.lambda_handler
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.8
-
-  # S3 buckets (input and output)
-  InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: csm-match-mock-data
-  
-  InputBucketNotifConfig:
-    Type: AWS::S3::Bucket NotificationConfiguration
-    Properties:
-      Bucket: !Ref InputS3BucketPOC2023
-      NotificationConfiguration:
-        LambdaConfigurations:
-          -
-            Event: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: suffix
-                    Value: .csv
-            Function: !GetAtt MyLambdaFunction.Arn
-            
-
-  OutputS3BucketPOC2023:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: csm-match-mock-data-matched
-      
 
       # LifecycleConfiguration:
       #   Rules:
