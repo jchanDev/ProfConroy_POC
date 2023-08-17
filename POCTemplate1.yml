@@ -170,7 +170,7 @@ Resources:
       BucketName: csm-match-mock-data
   
   InputBucketNotifConfig:
-    Type: AWS::S3::BucketNotification
+    Type: AWS::S3::Bucket NotificationConfiguration
     Properties:
       Bucket: !Ref InputS3BucketPOC2023
       NotificationConfiguration:
