@@ -36,6 +36,9 @@ Resources:
           - Effect: Allow
             Action: lambda:InvokeFunction
             Resource: !GetAtt MyLambdaFunction.Arn
+            Principal:
+              Service:
+                - lambda.amazonaws.com
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
