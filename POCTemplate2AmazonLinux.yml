@@ -1,16 +1,15 @@
 # stack with only ec2 instance
 
 # based on how many times we think the instance will have to run per quarter
-  # option 1: to have instance terminate each time so bash runs everytime
-  # option 2: find a way for instance to re-run userdata bash script w/o termination
+# option 1: to have instance terminate each time so bash runs every time
+# option 2: find a way for instance to re-run userdata bash script w/o termination
 
 Resources:
   MyIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles: 
-        - 
-          EC2-Instance-Role-POC-US-WEST-2
+        - EC2-Instance-Role-POC-US-WEST-2
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -28,18 +27,18 @@ Resources:
     Properties:
       SubnetId: subnet-09c627ce914a28786
       SecurityGroupIds:
-      - !Ref MySecurityGroup
+        - !Ref MySecurityGroup
       IamInstanceProfile: !Ref MyIAMInstanceProfile
       UserData:
-      #use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
-      #add credential section for github
-      #need secrets manager
-      #add statement to prevent delete of S3 bucket
-      #cloudwatch logs if error
-        #add secret manager fo github(add to role to talk to secret manager) use cli to get secret and then store in variable to pull github
-        #spot instances
-        #lambda to start run
-        #wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
+        # use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
+        # add credential section for github
+        # need secrets manager
+        # add statement to prevent delete of S3 bucket
+        # cloudwatch logs if error
+        # add secret manager for github (add to role to talk to secret manager) use cli to get secret and then store in variable to pull github
+        # spot instances
+        # lambda to start run
+        # wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
         Fn::Base64: !Sub |
           #!/bin/bash -x
           cd /tmp
@@ -51,8 +50,8 @@ Resources:
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
           wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
-        # pulling inputted csv file from s3 bucket
-        #  aws s3 cp "s3://csm-match-mock-data/mock_data.csv" /tmp
+          # pulling inputted csv file from s3 bucket
+          # aws s3 cp "s3://csm-match-mock-data/mock_data.csv" /tmp
           csvfilename=$(Rscript privateTest1.R)
           if [ -f "/tmp/$csvfilename" ]; then
             echo "CSV file exists in the directory."
@@ -61,7 +60,7 @@ Resources:
             echo "File does not exist. Failed" > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
-      InstanceType: t3.micro
+      InstanceType: c5.9xlarge
       AvailabilityZone: us-west-2b
       ImageId: ami-04e35eeae7a7c5883
       Tags:
