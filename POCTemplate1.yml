@@ -108,24 +108,41 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudformation:CreateStack
-                Resource: '*'
+                Resource: "*"
               - Effect: Allow
                 Action: s3:PutObject
                 Resource:
                   - arn:aws:s3:::csm-match-mock-data-matched
+
+  # S3 buckets (input and output)
+  InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: csm-match-mock-data
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Function: !GetAtt MyLambdaFunction.Arn
+            Event: "s3:ObjectCreated:*"
+
+  OutputS3BucketPOC2023:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: csm-match-mock-data-matched
+
   MyLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         ZipFile: !Sub |
           import boto3
-
           def lambda_handler(event, context):
-            try:
               # Parse event data
               s3_event = event['Records'][0]['s3']
+              print("s3event: " + s3_event)
               bucket_name = s3_event['bucket']['name']
+              print("bucketname: " + bucket_name)
               object_key = s3_event['object']['key']
+              print("objectkey: " + object_key)
 
               # Specify the CloudFormation template URL
               cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
@@ -141,53 +158,16 @@ Resources:
                   'statusCode': 200,
                   'body': 'Stack creation initiated'
               }
-              # error handle with print instead
-            except Exception as e:
-              s3 = boto3.client('s3')
-
-              # Specify the S3 bucket and file path
-              bucket_name = 'csm-match-mock-data-matched'
-              file_key = 'error_log.txt'
-
-              # Create the error message
-              error_message = f"Error: {str(e)}"
-
-              # Upload the error message as a text file to S3
-              s3.put_object(Bucket=bucket_name, Key=file_key, Body=error_message)
-
-              # Return a response indicating failure
-              return {
-                  'statusCode': 500,
-                  'body': 'An error occurred'
-              }
 
       Handler: POCLambda.lambda_handler
       Role: !GetAtt LambdaRole.Arn
       Runtime: python3.8
-
-  # S3 buckets (input and output)
-  InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: csm-match-mock-data
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Function: !GetAtt MyLambdaFunction.Arn
-            Event: 's3:ObjectCreated:*'
-            
-
-  OutputS3BucketPOC2023:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: csm-match-mock-data-matched
-      
 
       # LifecycleConfiguration:
       #   Rules:
       #     - Id: Retain3Days
       #       Status: Enabled
       #       ExpirationInDays: 3
-
 # following commands that local computer will have to run (in order)
 #1. Command to create stack:
 # aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --region us-west-2
