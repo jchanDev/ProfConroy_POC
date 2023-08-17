@@ -38,7 +38,7 @@ Resources:
             Resource: !GetAtt MyLambdaFunction.Arn
             Principal:
               Service:
-                - lambda.amazonaws.com
+                - s3.amazonaws.com
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
