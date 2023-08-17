@@ -121,11 +121,6 @@ Resources:
         LambdaConfigurations:
           -
             Event: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: suffix
-                    Value: .csv
             Function: !GetAtt MyLambdaFunction.Arn
 
   OutputS3BucketPOC2023:
