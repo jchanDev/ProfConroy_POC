@@ -67,7 +67,8 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess
+        # - arn:aws:iam::aws:policy/AmazonS3FullAccess
       Policies:
         - PolicyName: EC2S3AccessPolicy
           PolicyDocument:
@@ -105,6 +106,12 @@ Resources:
         - PolicyName: LambdaS3Policy
           PolicyDocument:
             Statement:
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                Resource: arn:aws:logs:*:*:*
               - Effect: Allow
                 Action:
                   - s3:GetObject
