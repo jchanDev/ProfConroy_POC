@@ -4,11 +4,11 @@ def lambda_handler(event, context):
     
     # Parse event data
     s3_event = event['Records'][0]['s3']
-    print("s3event: " + s3_event)
+    print(s3_event)
     bucket_name = s3_event['bucket']['name']
-    print("bucketname: " + bucket_name)
+    print(bucket_name)
     object_key = s3_event['object']['key']
-    print("objectkey: " + object_key)
+    print(object_key)
 
     # Specify the CloudFormation template URL
     cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
@@ -18,6 +18,8 @@ def lambda_handler(event, context):
     response = cloudformation_client.create_stack(
         StackName='POCTemplate2AmazonLinux',
         TemplateURL=cloudformation_template_url,
+        Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
+        OnFailure='DO_NOTHING'
     )
 
     return {
