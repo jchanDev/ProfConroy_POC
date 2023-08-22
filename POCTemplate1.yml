@@ -33,12 +33,6 @@ Resources:
               Service:
                 - ec2.amazonaws.com
                 - lambda.amazonaws.com
-          # - Effect: Allow
-          #   Action: lambda:InvokeFunction
-          #   Resource: !GetAtt MyLambdaFunction.Arn
-          #   # Principal:
-          #   #   Service:
-          #   #     - s3.amazonaws.com
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -47,7 +41,9 @@ Resources:
       PolicyDocument:
         Statement:
           - Effect: Allow
-            Action: s3:PutObject
+            Action: 
+              - s3:PutObject
+              - s3:GetObject
             Resource: arn:aws:s3:::csm-match-mock-data-matched/*
             Principal:
               Service:
@@ -88,7 +84,7 @@ Resources:
                   - "secretsmanager:DescribeSecret"
                 Resource: "*"
 
-  LambdaRole:
+  LaunchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: Lambda-Execution-Role-POC-US-WEST-2
@@ -101,7 +97,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: LambdaS3Policy
+        - PolicyName: LambdaLaunchPolicy
           PolicyDocument:
             Statement:
               - Effect: Allow
@@ -125,7 +121,7 @@ Resources:
                 Action: s3:PutObject
                 Resource:
                   - arn:aws:s3:::csm-match-mock-data-matched/*
-        - PolicyName: LambdaTemplate2Policy
+        - PolicyName: LaunchTemplate2Policy
           PolicyDocument:
             Statement:
               - Sid: VisualEditor0
@@ -242,6 +238,63 @@ Resources:
                   - arn:aws:iam::804665673296:instance-profile/*
                   - arn:aws:secretsmanager:*:804665673296:secret:*
 
+  DeleteLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: Lambda-Deletion-Role-POC-US-WEST-2
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: LambdaDeletePolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                  Action: s3:GetObject
+                  Resource:
+                    - arn:aws:s3:::csm-match-mock-data-matched/*
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - cloudformation:DeleteStack
+                Resource: "*"
+        - PolicyName: DeleteTemplate2Policy
+          PolicyDocument:
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:UnmonitorInstances
+                  - ec2:TerminateInstances
+                  - ec2:RevokeSecurityGroupEgress
+                  - ec2:DeleteSecurityGroup
+                  - ec2:ModifySecurityGroupRules
+                  - ec2:StopInstances
+                Resource:
+                  - arn:aws:ec2:*:804665673296:security-group-rule/*
+                  - arn:aws:ec2:*:804665673296:instance/*
+                  - arn:aws:ec2:*:804665673296:prefix-list/*
+                  - arn:aws:ec2:*:804665673296:security-group/*
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action:
+                  - iam:DeleteInstanceProfile
+                  - iam:GetInstanceProfile
+                  - iam:RemoveRoleFromInstanceProfile
+                  - iam:UntagInstanceProfile
+                Resource: arn:aws:iam::804665673296:instance-profile/*
+
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
     Type: AWS::S3::Bucket
@@ -266,3 +319,12 @@ Resources:
           - Id: Retain3Days
             Status: Enabled
             ExpirationInDays: 3
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .csv
+            Function: arn:aws:lambda:us-west-2:804665673296:function:POC-delete-temp2
