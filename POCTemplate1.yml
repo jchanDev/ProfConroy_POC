@@ -247,52 +247,22 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .csv
+            Function: arn:aws:lambda:us-west-2:804665673296:function:poc_test
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: csm-match-mock-data-matched
-
-  # MyLambdaFunction:
-  #   Type: AWS::Lambda::Function
-  #   Properties:
-  #     Code:
-  #       ZipFile: !Sub |
-  #         import boto3
-
-  #         def lambda_handler(event, context):
-              
-  #             # Parse event data
-  #             s3_event = event['Records'][0]['s3']
-  #             print(s3_event)
-  #             bucket_name = s3_event['bucket']['name']
-  #             print(bucket_name)
-  #             object_key = s3_event['object']['key']
-  #             print(object_key)
-
-  #             # Specify the CloudFormation template URL
-  #             cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
-
-  #             # Launch CloudFormation stack
-  #             cloudformation_client = boto3.client('cloudformation')
-  #             response = cloudformation_client.create_stack(
-  #                 StackName='POCTemplate2AmazonLinux',
-  #                 TemplateURL=cloudformation_template_url,
-  #                 Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
-  #                 OnFailure='DO_NOTHING'
-  #             )
-
-  #             return {
-  #                 'statusCode': 200,
-  #                 'body': 'Stack creation initiated'
-  #             }
-
-  #     Handler: POCLambda.lambda_handler
-  #     Role: !GetAtt LambdaRole.Arn
-  #     Runtime: python3.8
-
-  #     # LifecycleConfiguration:
-  #     #   Rules:
-  #     #     - Id: Retain3Days
-  #     #       Status: Enabled
-  #     #       ExpirationInDays: 3
+      LifecycleConfiguration:
+        Rules:
+          - Id: Retain3Days
+            Status: Enabled
+            ExpirationInDays: 3

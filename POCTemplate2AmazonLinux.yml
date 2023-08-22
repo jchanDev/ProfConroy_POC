@@ -61,7 +61,7 @@ Resources:
             echo "File does not exist. Failed" > error.txt
             aws s3 cp error.txt s3://csm-match-mock-data-matched/
           fi
-      InstanceType: c5.9xlarge
+      InstanceType: c5.2xlarge
       AvailabilityZone: us-west-2b
       ImageId: ami-04e35eeae7a7c5883
       Tags:
