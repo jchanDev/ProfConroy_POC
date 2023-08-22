@@ -68,7 +68,6 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess
-        # - arn:aws:iam::aws:policy/AmazonS3FullAccess
       Policies:
         - PolicyName: EC2S3AccessPolicy
           PolicyDocument:
@@ -101,7 +100,6 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
       Policies:
         - PolicyName: LambdaS3Policy
           PolicyDocument:
