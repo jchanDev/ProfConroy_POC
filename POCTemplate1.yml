@@ -255,9 +255,9 @@ Resources:
           PolicyDocument:
             Statement:
               - Effect: Allow
-                  Action: s3:GetObject
-                  Resource:
-                    - arn:aws:s3:::csm-match-mock-data-matched/*
+                Action: s3:GetObject
+                Resource:
+                  - arn:aws:s3:::csm-match-mock-data-matched/*
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
@@ -275,6 +275,12 @@ Resources:
                 Effect: Allow
                 Action:
                   - ec2:RevokeSecurityGroupIngress
+                  - ec2:DescribeInstances
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSecurityGroupRules
+                  - ec2:DescribeSecurityGroupReferences
+                  - ec2:DescribeInstanceTypes
+                  - ec2:DescribeInstanceStatus
                   - ec2:UnmonitorInstances
                   - ec2:TerminateInstances
                   - ec2:RevokeSecurityGroupEgress
@@ -308,7 +314,7 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
-            Function: arn:aws:lambda:us-west-2:804665673296:function:poc_test
+            Function: arn:aws:lambda:us-west-2:804665673296:function:POC-launch-temp2
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
