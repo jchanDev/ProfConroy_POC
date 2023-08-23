@@ -1,0 +1,129 @@
+# following commands that local computer will have to run (in order)
+#1. Command to create stack:
+# aws cloudformation create-stack --stack-name NewStackName --template-body file://path/to/your/existing-template.yaml --region us-west-2
+# 2. Command that will upload local csv file onto existing s3 bucket
+# aws s3 cp /path/to/your/csvfile.csv s3://your-existing-bucket-name/csvfile.csv
+
+# local computer will need credentials to run above
+
+# template plans:
+# 1. contains services that will run once and will stay; includes: output s3 bucket, security group, iam roles, input bucket
+# 2. contains services that will run everytime; includes: ec2 instance
+
+# to-do:
+#EC2 launch role
+#add a security group
+#vpc and subnet id
+#service catalog vpc
+#multiple parameters
+#parameters use default or json file in CLI
+
+# order of launch:
+# roles, buckets, bucket policy, lambda function
+
+Resources:
+
+  # Bucket policies and IAM roles
+  InputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref InputS3BucketPOC2023
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: s3:GetObject
+            Resource: arn:aws:s3:::csm-match-mock-data/* # could use !GetAtt for bucket arns
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+
+  OutputS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref OutputS3BucketPOC2023
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: 
+              - s3:PutObject
+              - s3:GetObject
+            Resource: arn:aws:s3:::csm-match-mock-data-matched/*
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2-Instance-Role-POC-US-WEST-2
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess
+      Policies:
+        - PolicyName: EC2S3AccessPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  - arn:aws:s3:::csm-match-mock-data/*
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: arn:aws:s3:::csm-match-mock-data-matched/*
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:DescribeSecret"
+                Resource: "*"
+
+  # S3 buckets (input and output)
+  InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - LambdaLaunchFunction
+      - LambdaDeleteFunction
+    Properties:
+      BucketName: csm-match-mock-data
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .csv
+            Function: !GetAtt LambdaLaunchFunction.Arn
+
+  OutputS3BucketPOC2023:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - LambdaLaunchFunction
+      - LambdaDeleteFunction
+    Properties:
+      BucketName: csm-match-mock-data-matched
+      LifecycleConfiguration:
+        Rules:
+          - Id: Retain3Days
+            Status: Enabled
+            ExpirationInDays: 3
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .csv
+            Function: !GetAtt LambdaDeleteFunction.Arn
