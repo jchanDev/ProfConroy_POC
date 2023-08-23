@@ -18,6 +18,9 @@
 #multiple parameters
 #parameters use default or json file in CLI
 
+# order of launch:
+# roles, buckets, bucket policy, lambda function
+
 Resources:
   # Bucket policies and IAM roles
   InputS3BucketPolicy:
@@ -28,7 +31,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action: s3:GetObject
-            Resource: arn:aws:s3:::csm-match-mock-data/*
+            Resource: arn:aws:s3:::csm-match-mock-data/* # could use !GetAtt for bucket arns
             Principal:
               Service:
                 - ec2.amazonaws.com
@@ -124,16 +127,14 @@ Resources:
         - PolicyName: LaunchTemplate2Policy
           PolicyDocument:
             Statement:
-              - Sid: VisualEditor0
-                Effect: Allow
-                Action:
+              - Action:
                   - ec2:DescribeInstances
                   - ec2:DescribeInstanceTypes
                   - ec2:DescribeSecurityGroups
                 Resource: "*"
-              - Sid: VisualEditor1
                 Effect: Allow
-                Action:
+                Sid: VisualEditor0
+              - Action:
                   - ec2:RebootInstances
                   - ec2:AuthorizeSecurityGroupEgress
                   - ec2:AuthorizeSecurityGroupIngress
@@ -223,9 +224,9 @@ Resources:
                   - arn:aws:ec2:*:804665673296:verified-access-endpoint/*
                   - arn:aws:ec2:*:804665673296:egress-only-internet-gateway/*
                   - arn:aws:ec2::804665673296:ipam-scope/*
-              - Sid: VisualEditor2
                 Effect: Allow
-                Action:
+                Sid: VisualEditor1
+              - Action:
                   - iam:CreateInstanceProfile
                   - iam:PassRole
                   - secretsmanager:GetSecretValue
@@ -237,6 +238,8 @@ Resources:
                   - arn:aws:iam::804665673296:role/*
                   - arn:aws:iam::804665673296:instance-profile/*
                   - arn:aws:secretsmanager:*:804665673296:secret:*
+                Effect: Allow
+                Sid: VisualEditor2
 
   DeleteLambdaRole:
     Type: AWS::IAM::Role
@@ -271,9 +274,7 @@ Resources:
         - PolicyName: DeleteTemplate2Policy
           PolicyDocument:
             Statement:
-              - Sid: VisualEditor0
-                Effect: Allow
-                Action:
+              - Action:
                   - ec2:RevokeSecurityGroupIngress
                   - ec2:DescribeInstances
                   - ec2:DescribeSecurityGroups
@@ -292,14 +293,84 @@ Resources:
                   - arn:aws:ec2:*:804665673296:instance/*
                   - arn:aws:ec2:*:804665673296:prefix-list/*
                   - arn:aws:ec2:*:804665673296:security-group/*
-              - Sid: VisualEditor1
                 Effect: Allow
-                Action:
+                Sid: VisualEditor0
+              - Action:
                   - iam:DeleteInstanceProfile
                   - iam:GetInstanceProfile
                   - iam:RemoveRoleFromInstanceProfile
                   - iam:UntagInstanceProfile
                 Resource: arn:aws:iam::804665673296:instance-profile/*
+                Effect: Allow
+                Sid: VisualEditor1
+
+  MyCloudWatchRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      EventBusName: #add
+      
+
+  # lambda functions
+  LambdaLaunchFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: LaunchLambdaRole
+    Properties:
+      Code:
+        ZipFile: !Sub |
+          import boto3
+
+          def lambda_handler(event, context):
+              
+              # Parse event data
+              s3_event = event['Records'][0]['s3']
+              print(s3_event)
+              bucket_name = s3_event['bucket']['name']
+              print(bucket_name)
+              object_key = s3_event['object']['key']
+              print(object_key)
+
+              # Specify the CloudFormation template URL
+              cloudformation_template_url = "https://lambda-store-bucket-poc-2023.s3.us-west-2.amazonaws.com/POCTemplate2AmazonLinux.yml"
+
+              # Launch CloudFormation stack
+              cloudformation_client = boto3.client('cloudformation')
+              response = cloudformation_client.create_stack(
+                  StackName='POCTemplate2AmazonLinux',
+                  TemplateURL=cloudformation_template_url,
+                  Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
+                  OnFailure='DO_NOTHING'
+              )
+
+              return {
+                  'statusCode': 200,
+                  'body': 'Stack creation initiated'
+              }
+      Handler: index.lambda_handler
+      Role: !GetAtt LaunchLambdaRole.Arn
+      Runtime: python3.11 
+
+  LambdaDeleteFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: DeleteLambdaRole
+    Properties:
+      Code:
+        ZipFile: !Sub |
+          import boto3
+
+          def lambda_handler(event, context):
+              
+              cloudformation_client = boto3.client('cloudformation')
+              
+              # delete CloudFormation stack
+              response = cloudformation_client.delete_stack(StackName= "POCTemplate2AmazonLinux")
+
+              return {
+                  'statusCode': 200,
+                  'body': 'Stack deletion initiated for POCTemplate2AmazonLinux'
+              }
+      Handler: index.lambda_handler
+      Role: !GetAtt DeleteLambdaRole.Arn
+      Runtime: python3.11 
 
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
@@ -314,7 +385,7 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
-            Function: arn:aws:lambda:us-west-2:804665673296:function:POC-launch-temp2
+            Function: !GetAtt LambdaLaunchFunction.Arn
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
@@ -333,4 +404,4 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
-            Function: arn:aws:lambda:us-west-2:804665673296:function:POC-delete-temp2
+            Function: !GetAtt LambdaDeleteFunction.Arn
