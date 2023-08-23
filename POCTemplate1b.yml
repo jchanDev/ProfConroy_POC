@@ -91,9 +91,6 @@ Resources:
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
     Type: AWS::S3::Bucket
-    DependsOn:
-      - LambdaLaunchFunction
-      - LambdaDeleteFunction
     Properties:
       BucketName: csm-match-mock-data
       NotificationConfiguration:
@@ -104,13 +101,10 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
-            Function: !GetAtt LambdaLaunchFunction.Arn
+            Function: arn:aws:lambda:us-west-2:804665673296:function:Template1aPOC-LambdaLaunchFunction-8ubaOx0xnrSk
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
-    DependsOn:
-      - LambdaLaunchFunction
-      - LambdaDeleteFunction
     Properties:
       BucketName: csm-match-mock-data-matched
       LifecycleConfiguration:
@@ -126,4 +120,4 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
-            Function: !GetAtt LambdaDeleteFunction.Arn
+            Function: arn:aws:lambda:us-west-2:804665673296:function:Template1aPOC-LambdaDeleteFunction-SEs2yxrTkVTA
