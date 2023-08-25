@@ -338,6 +338,7 @@ Resources:
       Handler: index.lambda_handler
       Role: !GetAtt LaunchLambdaRole.Arn
       Runtime: python3.11 
+      
   LambdaDeleteFunction:
     Type: AWS::Lambda::Function
     DependsOn: DeleteLambdaRole
@@ -372,7 +373,7 @@ Resources:
   LambdaDeleteS3Permission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt LambdaLaunchFunction.Arn
+      FunctionName: !GetAtt LambdaDeleteFunction.Arn
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref "AWS::AccountId"
@@ -397,6 +398,7 @@ Resources:
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
+    DependsOn: LambdaDeleteS3Permission
     Properties:
       BucketName: csm-match-mock-data-matched
       LifecycleConfiguration:
