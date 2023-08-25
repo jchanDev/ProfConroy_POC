@@ -4,6 +4,7 @@
 # option 1: to have instance terminate each time so bash runs every time
 # option 2: find a way for instance to re-run userdata bash script w/o termination
 
+# when updated, upload new ver to lambda-store-bucket-poc-2023 !!!!!!
 Resources:
   MyIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile

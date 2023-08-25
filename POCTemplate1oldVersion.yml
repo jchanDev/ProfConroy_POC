@@ -95,6 +95,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
       Policies:
         - PolicyName: LambdaLaunchPolicy
           PolicyDocument:
@@ -338,7 +339,7 @@ Resources:
       Handler: index.lambda_handler
       Role: !GetAtt LaunchLambdaRole.Arn
       Runtime: python3.11 
-      
+
   LambdaDeleteFunction:
     Type: AWS::Lambda::Function
     DependsOn: DeleteLambdaRole

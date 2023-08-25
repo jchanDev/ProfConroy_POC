@@ -1,4 +1,3 @@
-
 #Load the data
 data<-read.csv("CSM_Match_Mock_Data_20230720_164351.csv")
 
