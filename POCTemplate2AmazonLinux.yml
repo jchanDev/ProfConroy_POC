@@ -40,8 +40,6 @@ Resources:
         # lambda to start run
         # wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
         
-        # pulling inputted csv file from s3 bucket
-        # aws s3 cp "s3://csm-match-mock-data/mock_data.csv" /tmp
         Fn::Base64: !Sub |
           #!/bin/bash -x
           cd /tmp
@@ -50,9 +48,11 @@ Resources:
           sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
           sudo yum install R -y
+          pulling inputted csv file from s3 bucket
+          aws s3 cp "s3://csm-match-mock-data/CSM_Match_Mock_Data_20230720_164351.csv" /tmp
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
-          wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC_private_test/main/privateTest1.R
+          wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/dconroybeam/CSM-Match/main/Mock%20Data/CSM%20Match%20Mock%20Matching%20Script%2020230720.Rmd
           csvfilename=$(Rscript privateTest1.R)
           if [ -f "/tmp/$csvfilename" ]; then
             echo "CSV file exists in the directory."

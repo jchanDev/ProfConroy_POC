@@ -146,10 +146,16 @@ dataMatched<-mateChoice(data)
 
 #Timestamp the filename:
 
-path<-""
+path <-"/tmp"
 
-format<-".csv"
-date<-format(Sys.time(),format="%Y%m%d %H%M%S")
-file<-file.path(paste0(path,date,format))
+format <-".csv"
+date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
+csvfilename <- paste("MockData_", date, ".csv", sep = "")
+file <- file.path(path, csvfilename)
 
-write.csv(dataMatched,file=file,row.names=F)
+return_csvfilename <- function() {
+  return(cat(csvfilename))
+}
+return_csvfilename()  
+
+write.csv(dataMatched, file = file, row.names = FALSE)
