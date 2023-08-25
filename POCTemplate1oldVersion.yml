@@ -290,10 +290,6 @@ Resources:
                   - ec2:ModifySecurityGroupRules
                   - ec2:StopInstances
                 Resource: '*'
-                  # - arn:aws:ec2:*:804665673296:security-group-rule/*
-                  # - arn:aws:ec2:*:804665673296:instance/*
-                  # - arn:aws:ec2:*:804665673296:prefix-list/*
-                  # - arn:aws:ec2:*:804665673296:security-group/*
                 Effect: Allow
                 Sid: VisualEditor0
               - Action:
@@ -368,7 +364,6 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref "AWS::AccountId"
-      #SourceArn: "arn:aws:s3:::csm-*"
       SourceArn: "arn:aws:s3:::*"
 
   LambdaDeleteS3Permission:
@@ -378,7 +373,6 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref "AWS::AccountId"
-      #SourceArn: "arn:aws:s3:::csm-*"
       SourceArn: "arn:aws:s3:::*"
       
   # S3 buckets (input and output)
