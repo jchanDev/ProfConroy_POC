@@ -17,6 +17,16 @@
 # order of launch:
 # roles, buckets, bucket policy, lambda function
 
+# Parameters:
+#   InputBucketName:
+#     Type: String
+#     Default: csm-match-mock-data
+#     Description: Name of the input bucket
+  
+#   OutputBucketName:
+#     Type: String
+#     Default: csm-match-mock-data-matched
+#     Description: Name of the output bucket
 Parameters:
   InputBucketName:
     Type: String
@@ -27,13 +37,12 @@ Parameters:
     Type: String
     Default: csm-match-mock-data-matched
     Description: Name of the output bucket
-  
 
 Resources:
   # Bucket policies and IAM roles
   InputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    DependsOn: InputS3BucketPOC2023
+    # DependsOn: InputS3BucketPOC2023
     Properties:
       Bucket: !Ref InputS3BucketPOC2023
       PolicyDocument:
@@ -48,7 +57,7 @@ Resources:
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    DependsOn: OutputS3BucketPOC2023
+    # DependsOn: OutputS3BucketPOC2023
     Properties:
       Bucket: !Ref OutputS3BucketPOC2023
       PolicyDocument:
@@ -65,9 +74,9 @@ Resources:
 
   EC2InstanceRole:
     Type: AWS::IAM::Role
-    DependsOn: 
-      - InputS3BucketPOC2023
-      - OutputS3BucketPOC2023
+    # DependsOn: 
+    #   - InputS3BucketPOC2023
+    #   - OutputS3BucketPOC2023
     Properties:
       RoleName: EC2-Instance-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -86,10 +95,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:GetObject
-                Resource: !GetAtt InputS3BucketPOC2023.Arn
+                Resource: !Sub arn:aws:s3:::${InputBucketName}/*
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !GetAtt OutputS3BucketPOC2023.Arn
+                Resource: !Sub arn:aws:s3:::${OutputBucketName}/*
         - PolicyName: SecretsManagerAccess
           PolicyDocument:
             Statement:
@@ -101,9 +110,9 @@ Resources:
 
   LaunchLambdaRole:
     Type: AWS::IAM::Role
-    DependsOn: 
-      - InputS3BucketPOC2023
-      - OutputS3BucketPOC2023
+    # DependsOn: 
+    #   - InputS3BucketPOC2023
+    #   - OutputS3BucketPOC2023
     Properties:
       RoleName: Lambda-Execution-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -131,7 +140,7 @@ Resources:
                   - s3:ListBucket
                   - s3:GetBucketNotification
                 Resource:
-                  - !GetAtt InputS3BucketPOC2023.Arn
+                  - !Sub arn:aws:s3:::${InputBucketName}/*
                   - arn:aws:s3:::lambda-store-bucket-poc-2023/*
               - Effect: Allow
                 Action:
@@ -139,7 +148,7 @@ Resources:
                 Resource: "*"
               - Effect: Allow
                 Action: s3:PutObject
-                Resource: !GetAtt OutputS3BucketPOC2023.Arn
+                Resource: !Sub arn:aws:s3:::${OutputBucketName}/*
         - PolicyName: LaunchTemplate2Policy
           PolicyDocument:
             Statement:
@@ -259,7 +268,7 @@ Resources:
 
   DeleteLambdaRole:
     Type: AWS::IAM::Role
-    DependsOn: OutputS3BucketPOC2023
+    # DependsOn: OutputS3BucketPOC2023
     Properties:
       RoleName: Lambda-Deletion-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -280,7 +289,7 @@ Resources:
                   - s3:GetObject
                   - s3:ListBucket
                   - s3:GetBucketNotification
-                Resource: !GetAtt OutputS3BucketPOC2023.Arn
+                Resource: !Sub arn:aws:s3:::${OutputBucketName}/*
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
@@ -378,7 +387,7 @@ Resources:
 
   LambdaLaunchS3Permission:
     Type: AWS::Lambda::Permission
-    DependsOn: LambdaLaunchFunction
+    # DependsOn: LambdaLaunchFunction
     Properties:
       FunctionName: !GetAtt LambdaLaunchFunction.Arn
       Action: lambda:InvokeFunction
@@ -388,7 +397,7 @@ Resources:
 
   LambdaDeleteS3Permission:
     Type: AWS::Lambda::Permission
-    DependsOn: LambdaDeleteFunction
+    # DependsOn: LambdaDeleteFunction
     Properties:
       FunctionName: !GetAtt LambdaDeleteFunction.Arn
       Action: lambda:InvokeFunction
@@ -399,22 +408,22 @@ Resources:
   # S3 buckets (input and output)
   InputS3BucketPOC2023: # have object (csv file) delete after we get output csv in output bucket
     Type: AWS::S3::Bucket
-    # DependsOn: LambdaLaunchS3Permission
+    DependsOn: LambdaLaunchS3Permission
     Properties:
         BucketName: !Ref InputBucketName
-        # NotificationConfiguration:
-        #   LambdaConfigurations:
-        #     - Event: s3:ObjectCreated:*
-        #       Filter:
-        #         S3Key:
-        #           Rules:
-        #             - Name: suffix
-        #               Value: ".csv"
-        #       Function: !GetAtt LambdaLaunchFunction.Arn
+        NotificationConfiguration:
+          LambdaConfigurations:
+            - Event: s3:ObjectCreated:*
+              Filter:
+                S3Key:
+                  Rules:
+                    - Name: suffix
+                      Value: ".csv"
+              Function: !GetAtt LambdaLaunchFunction.Arn
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
-    # DependsOn: LambdaDeleteS3Permission
+    DependsOn: LambdaDeleteS3Permission
     Properties:
       BucketName: !Ref OutputBucketName
       LifecycleConfiguration:
@@ -422,12 +431,12 @@ Resources:
           - Id: Retain3Days
             Status: Enabled
             ExpirationInDays: 3
-      # NotificationConfiguration:
-      #   LambdaConfigurations:
-      #     - Event: s3:ObjectCreated:Put
-      #       Filter:
-      #         S3Key:
-      #           Rules:
-      #             - Name: suffix
-      #               Value: .csv
-      #       Function: !GetAtt LambdaDeleteFunction.Arn
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .csv
+            Function: !GetAtt LambdaDeleteFunction.Arn
