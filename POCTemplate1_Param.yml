@@ -14,19 +14,7 @@
 #service catalog vpc
 #multiple parameters
 #parameters use default or json file in CLI
-# order of launch:
-# roles, buckets, bucket policy, lambda function
 
-# Parameters:
-#   InputBucketName:
-#     Type: String
-#     Default: csm-match-mock-data
-#     Description: Name of the input bucket
-  
-#   OutputBucketName:
-#     Type: String
-#     Default: csm-match-mock-data-matched
-#     Description: Name of the output bucket
 Parameters:
   InputBucketName:
     Type: String
@@ -47,7 +35,6 @@ Resources:
   # Bucket policies and IAM roles
   InputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    # DependsOn: InputS3BucketPOC2023
     Properties:
       Bucket: !Ref InputS3BucketPOC2023
       PolicyDocument:
@@ -62,7 +49,6 @@ Resources:
 
   OutputS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    # DependsOn: OutputS3BucketPOC2023
     Properties:
       Bucket: !Ref OutputS3BucketPOC2023
       PolicyDocument:
@@ -79,9 +65,6 @@ Resources:
 
   EC2InstanceRole:
     Type: AWS::IAM::Role
-    # DependsOn: 
-    #   - InputS3BucketPOC2023
-    #   - OutputS3BucketPOC2023
     Properties:
       RoleName: EC2-Instance-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -115,9 +98,6 @@ Resources:
 
   LaunchLambdaRole:
     Type: AWS::IAM::Role
-    # DependsOn: 
-    #   - InputS3BucketPOC2023
-    #   - OutputS3BucketPOC2023
     Properties:
       RoleName: Lambda-Execution-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -163,99 +143,97 @@ Resources:
                   - ec2:DescribeSecurityGroups
                 Resource: "*"
                 Effect: Allow
-                Sid: VisualEditor0
               - Action:
                   - ec2:RebootInstances
                   - ec2:AuthorizeSecurityGroupEgress
                   - ec2:AuthorizeSecurityGroupIngress
-                  - ec2:TerminateInstances
-                  - ec2:DeleteTags
-                  - ec2:MonitorInstances
+                  # - ec2:TerminateInstances
+                  # - ec2:DeleteTags
                   - ec2:CreateTags
-                  - ec2:RunInstances
-                  - ec2:StopInstances
                   - ec2:StartInstances
+                  - ec2:RunInstances
+                  - ec2:MonitorInstances
+                  # - ec2:StopInstances
                   - ec2:CreateSecurityGroup
                   - ec2:AssociateSubnetCidrBlock
                   - ec2:ApplySecurityGroupsToClientVpnTargetNetwork
                   - ec2:AssociateIamInstanceProfile
                 Resource:
-                  - arn:aws:ec2:*:804665673296:transit-gateway-multicast-domain/*
-                  - arn:aws:ec2:*:804665673296:vpn-connection/*
-                  - arn:aws:ec2:*:804665673296:capacity-reservation/*
-                  - arn:aws:ec2:*:804665673296:prefix-list/*
-                  - arn:aws:ec2:*:804665673296:launch-template/*
-                  - arn:aws:ec2:*:804665673296:internet-gateway/*
-                  - arn:aws:ec2:*:804665673296:vpc-endpoint/*
-                  - arn:aws:ec2:*:804665673296:network-acl/*
-                  - arn:aws:ec2:*:804665673296:traffic-mirror-filter/*
-                  - arn:aws:ec2:*:804665673296:security-group-rule/*
-                  - arn:aws:ec2:*:804665673296:vpc/*
-                  - arn:aws:ec2::804665673296:ipam/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway-attachment/*
-                  - arn:aws:ec2:*:804665673296:fleet/*
-                  - arn:aws:ec2:*:804665673296:natgateway/*
-                  - arn:aws:ec2:*:804665673296:dedicated-host/*
-                  - arn:aws:ec2:*:804665673296:capacity-reservation-fleet/*
-                  - arn:aws:ec2:*:804665673296:local-gateway-route-table-virtual-interface-group-association/*
-                  - arn:aws:ec2:*:804665673296:route-table/*
-                  - arn:aws:ec2:*:804665673296:verified-access-group/*
-                  - arn:aws:ec2:*:804665673296:fpga-image/*
-                  - arn:aws:ec2:*:804665673296:elastic-ip/*
-                  - arn:aws:ec2:*:804665673296:network-interface/*
-                  - arn:aws:ec2:*:804665673296:dhcp-options/*
-                  - arn:aws:ec2:*:804665673296:vpn-gateway/*
-                  - arn:aws:ec2:*:804665673296:key-pair/*
-                  - arn:aws:ec2:*:804665673296:local-gateway-route-table-vpc-association/*
-                  - arn:aws:ec2:*:804665673296:local-gateway/*
-                  - arn:aws:ec2::804665673296:ipam-pool/*
-                  - arn:aws:ec2:*:804665673296:volume/*
-                  - arn:aws:ec2::804665673296:ipam-resource-discovery/*
-                  - arn:aws:ec2:*:804665673296:traffic-mirror-session/*
-                  - arn:aws:ec2:*:804665673296:placement-group/*
-                  - arn:aws:ec2:*:804665673296:instance/*
-                  - arn:aws:ec2::804665673296:ipam-resource-discovery-association/*
-                  - arn:aws:ec2:*:804665673296:security-group/*
-                  - arn:aws:ec2:*:804665673296:local-gateway-route-table/*
-                  - arn:aws:ec2:*:804665673296:replace-root-volume-task/*
-                  - arn:aws:ec2:*:804665673296:local-gateway-virtual-interface-group/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway-connect-peer/*
-                  - arn:aws:ec2:*:804665673296:subnet/*
-                  - arn:aws:ec2:*:804665673296:network-insights-access-scope-analysis/*
-                  - arn:aws:ec2:*::snapshot/*
-                  - arn:aws:ec2:*:804665673296:instance-event-window/*
-                  - arn:aws:ec2:*:804665673296:export-image-task/*
-                  - arn:aws:ec2:*:804665673296:spot-fleet-request/*
-                  - arn:aws:ec2:*:804665673296:import-snapshot-task/*
-                  - arn:aws:ec2:*:804665673296:client-vpn-endpoint/*
-                  - arn:aws:ec2:*:804665673296:vpc-peering-connection/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway-route-table-announcement/*
-                  - arn:aws:ec2:*:804665673296:export-instance-task/*
-                  - arn:aws:ec2:*:804665673296:verified-access-instance/*
-                  - arn:aws:ec2:*:804665673296:instance-connect-endpoint/*
-                  - arn:aws:ec2:*:804665673296:carrier-gateway/*
-                  - arn:aws:ec2:*::image/*
-                  - arn:aws:ec2:*:804665673296:ipv4pool-ec2/*
-                  - arn:aws:ec2:*:804665673296:network-insights-analysis/*
-                  - arn:aws:ec2:*:804665673296:import-image-task/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway-route-table/*
-                  - arn:aws:ec2:*:804665673296:verified-access-trust-provider/*
-                  - arn:aws:ec2:*:804665673296:network-insights-path/*
-                  - arn:aws:ec2:*:804665673296:vpc-flow-log/*
-                  - arn:aws:ec2:*:804665673296:spot-instances-request/*
-                  - arn:aws:ec2:*:804665673296:network-insights-access-scope/*
-                  - arn:aws:ec2:*:804665673296:transit-gateway-policy-table/*
-                  - arn:aws:ec2:*:804665673296:vpc-endpoint-service/*
-                  - arn:aws:ec2:*:804665673296:traffic-mirror-target/*
-                  - arn:aws:ec2:*:804665673296:coip-pool/*
-                  - arn:aws:ec2:*:804665673296:reserved-instances/*
-                  - arn:aws:ec2:*:804665673296:customer-gateway/*
-                  - arn:aws:ec2:*:804665673296:verified-access-endpoint/*
-                  - arn:aws:ec2:*:804665673296:egress-only-internet-gateway/*
-                  - arn:aws:ec2::804665673296:ipam-scope/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-multicast-domain/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpn-connection/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:capacity-reservation/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:prefix-list/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:launch-template/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:internet-gateway/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpc-endpoint/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-acl/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:traffic-mirror-filter/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:security-group-rule/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpc/*
+                  - !Sub arn:aws:ec2::${AWS::AccountId}:ipam/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:fleet/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:natgateway/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:dedicated-host/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:capacity-reservation-fleet/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:local-gateway-route-table-virtual-interface-group-association/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:route-table/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:verified-access-group/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:fpga-image/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:elastic-ip/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-interface/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:dhcp-options/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpn-gateway/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:key-pair/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:local-gateway-route-table-vpc-association/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:local-gateway/*
+                  - !Sub arn:aws:ec2::${AWS::AccountId}:ipam-pool/*
+                  # - !Sub arn:aws:ec2:*:${AWS::AccountId}:volume/*
+                  - !Sub arn:aws:ec2::${AWS::AccountId}:ipam-resource-discovery/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:traffic-mirror-session/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:placement-group/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:instance/*
+                  - !Sub arn:aws:ec2::${AWS::AccountId}:ipam-resource-discovery-association/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:security-group/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:local-gateway-route-table/*
+                  # - !Sub arn:aws:ec2:*:${AWS::AccountId}:replace-root-volume-task/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:local-gateway-virtual-interface-group/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-connect-peer/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:subnet/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-insights-access-scope-analysis/*
+                  - !Sub arn:aws:ec2:*::snapshot/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:instance-event-window/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:export-image-task/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:spot-fleet-request/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:import-snapshot-task/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:client-vpn-endpoint/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpc-peering-connection/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-route-table-announcement/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:export-instance-task/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:verified-access-instance/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:instance-connect-endpoint/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:carrier-gateway/*
+                  - !Sub arn:aws:ec2:*::image/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:ipv4pool-ec2/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-insights-analysis/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:import-image-task/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-route-table/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:verified-access-trust-provider/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-insights-path/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpc-flow-log/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:spot-instances-request/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:network-insights-access-scope/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:transit-gateway-policy-table/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:vpc-endpoint-service/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:traffic-mirror-target/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:coip-pool/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:reserved-instances/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:customer-gateway/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:verified-access-endpoint/*
+                  - !Sub arn:aws:ec2:*:${AWS::AccountId}:egress-only-internet-gateway/*
+                  - !Sub arn:aws:ec2::${AWS::AccountId}:ipam-scope/*
                 Effect: Allow
-                Sid: VisualEditor1
               - Action:
                   - iam:CreateInstanceProfile
                   - iam:PassRole
@@ -265,15 +243,13 @@ Resources:
                   - iam:AddRoleToInstanceProfile
                   - iam:TagInstanceProfile
                 Resource:
-                  - arn:aws:iam::804665673296:role/*
-                  - arn:aws:iam::804665673296:instance-profile/*
-                  - arn:aws:secretsmanager:*:804665673296:secret:*
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/*
+                  - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
                 Effect: Allow
-                Sid: VisualEditor2
 
   DeleteLambdaRole:
     Type: AWS::IAM::Role
-    # DependsOn: OutputS3BucketPOC2023
     Properties:
       RoleName: Lambda-Deletion-Role-POC-US-WEST-2
       AssumeRolePolicyDocument:
@@ -320,6 +296,7 @@ Resources:
             Statement:
               - Action:
                   - ec2:RevokeSecurityGroupIngress
+                  - ec2:RevokeSecurityGroupEgress
                   - ec2:DescribeInstances
                   - ec2:DescribeSecurityGroups
                   - ec2:DescribeSecurityGroupRules
@@ -328,21 +305,18 @@ Resources:
                   - ec2:DescribeInstanceStatus
                   - ec2:UnmonitorInstances
                   - ec2:TerminateInstances
-                  - ec2:RevokeSecurityGroupEgress
                   - ec2:DeleteSecurityGroup
-                  - ec2:ModifySecurityGroupRules
+                  # - ec2:ModifySecurityGroupRules
                   - ec2:StopInstances
                 Resource: '*' # wildcard avoided perm issue (use tags)
                 Effect: Allow
-                Sid: VisualEditor0
               - Action:
                   - iam:DeleteInstanceProfile
                   - iam:GetInstanceProfile
                   - iam:RemoveRoleFromInstanceProfile
                   - iam:UntagInstanceProfile
-                Resource: arn:aws:iam::804665673296:instance-profile/*
+                Resource: !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/*
                 Effect: Allow
-                Sid: VisualEditor1
  
   ProfConroyEmailSNS:
     Type: AWS::SNS::Topic
@@ -444,7 +418,6 @@ Resources:
 
   LambdaLaunchS3Permission:
     Type: AWS::Lambda::Permission
-    # DependsOn: LambdaLaunchFunction
     Properties:
       FunctionName: !GetAtt LambdaLaunchFunction.Arn
       Action: lambda:InvokeFunction
@@ -454,7 +427,6 @@ Resources:
 
   LambdaDeleteS3Permission:
     Type: AWS::Lambda::Permission
-    # DependsOn: LambdaDeleteFunction
     Properties:
       FunctionName: !GetAtt LambdaDeleteFunction.Arn
       Action: lambda:InvokeFunction
