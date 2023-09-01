@@ -38,6 +38,11 @@ Parameters:
     Default: csm-match-mock-data-matched
     Description: Name of the output bucket
 
+  EmailSNS:
+    Type: String
+    Default: jchan975@ucsb.edu
+    Description: Email address to send SNS notifications to
+
 Resources:
   # Bucket policies and IAM roles
   InputS3BucketPolicy:
@@ -339,17 +344,20 @@ Resources:
                 Resource: arn:aws:iam::804665673296:instance-profile/*
                 Effect: Allow
                 Sid: VisualEditor1
+ 
   ProfConroyEmailSNS:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: ProfConroyEmailSNS
       DisplayName: ProfConroyEmailSNS
+ 
   ProfConroyEmailSNSSubscription:
     Type: AWS::SNS::Subscription
     Properties:
       Protocol: email
       TopicArn: !Ref ProfConroyEmailSNS
-      Endpoint: jchan975@ucsb.edu
+      Endpoint: !Ref EmailSNS
+  
   # lambda functions
   LambdaLaunchFunction:
     Type: AWS::Lambda::Function
