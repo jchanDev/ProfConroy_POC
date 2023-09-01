@@ -293,8 +293,6 @@ Resources:
                   - sns:Publish
                   - sns:ListTopics
                   - sns:GetTopicAttributes
-                  - sns:Subscribe
-                  - sns:Receive
                 Resource: !Ref ProfConroyEmailSNS
         - PolicyName: LambdaDeletePolicy
           PolicyDocument:
