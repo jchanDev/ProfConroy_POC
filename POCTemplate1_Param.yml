@@ -289,7 +289,7 @@ Resources:
                   - sns:Publish
                   - sns:ListTopics
                   - sns:GetTopicAttributes
-                Resource: arn:aws:sns:us-west-2:804665673296:ProfConroyEmailSNS
+                Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${ProfConroyEmailSNS}
         - PolicyName: LambdaDeletePolicy
           PolicyDocument:
             Statement:
