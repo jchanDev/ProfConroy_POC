@@ -279,7 +279,17 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
       Policies:
+        - PolicyName: SNSPublishPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                  - sns:ListTopics
+                  - sns:GetTopicAttributes
+                Resource: arn:aws:sns:us-west-2:804665673296:ProfConroyEmailSNS
         - PolicyName: LambdaDeletePolicy
           PolicyDocument:
             Statement:
@@ -328,7 +338,17 @@ Resources:
                 Resource: arn:aws:iam::804665673296:instance-profile/*
                 Effect: Allow
                 Sid: VisualEditor1
-
+  ProfConroyEmailSNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: ProfConroyEmailSNS
+      DisplayName: ProfConroyEmailSNS
+  ProfConroyEmailSNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      TopicArn: !Ref ProfConroyEmailSNS
+      Endpoint: jchan975@ucsb.edu
   # lambda functions
   LambdaLaunchFunction:
     Type: AWS::Lambda::Function
@@ -368,19 +388,48 @@ Resources:
     Type: AWS::Lambda::Function
     DependsOn: DeleteLambdaRole
     Properties:
+      Environment:
+        Variables:
+          OutputBucketName:
+            Ref: OutputBucketName
+          EmailSNS:
+            Ref: ProfConroyEmailSNS
+          # EmailSNS: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${ProfConroyEmailSNS}
+
       Code:
         ZipFile: !Sub |
+          import os
           import boto3
           def lambda_handler(event, context):
+            # send email with link to user
+            cloudformation_client = boto3.client('cloudformation')
+            sns_client = boto3.client('sns')
+            s3_client = boto3.client('s3')
+            outputBucketName = os.environ['OutputBucketName']
+            emailSNS = os.environ['EmailSNS']
+            print(outputBucketName)
+            object_key = event['Records'][0]['s3']['object']['key']
+            expiration_time = 2 * 86400 # 2 days in seconds
+            presigned_url = s3_client.generate_presigned_url(
+              'get_object',
+              Params={'Bucket': outputBucketName, 'Key': object_key},
+              ExpiresIn=expiration_time
+            )
+            sns_subject = 'Your output file is ready'
+            sns_message = 'Your output file is ready. Please download it from the following link: ' + presigned_url
+
+            sns_client.publish(
+              TopicArn=emailSNS,
+              Subject=sns_subject,
+              Message=sns_message
+            )
               
-              cloudformation_client = boto3.client('cloudformation')
-              
-              # delete CloudFormation stack
-              response = cloudformation_client.delete_stack(StackName= "POCTemplate2AmazonLinux")
-              return {
-                  'statusCode': 200,
-                  'body': 'Stack deletion initiated for POCTemplate2AmazonLinux'
-              }
+            # delete CloudFormation stack
+            response = cloudformation_client.delete_stack(StackName= "POCTemplate2AmazonLinux")
+            return {
+                'statusCode': 200,
+                'body': 'Stack deletion initiated for POCTemplate2AmazonLinux and SNS message sent'
+            }
       Handler: index.lambda_handler
       Role: !GetAtt DeleteLambdaRole.Arn
       Runtime: python3.11 
