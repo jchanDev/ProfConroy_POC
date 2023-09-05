@@ -270,7 +270,6 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        # - arn:aws:iam::aws:policy/AmazonSNSFullAccess
       Policies:
         - PolicyName: SNSPublishPolicy
           PolicyDocument:
@@ -280,6 +279,7 @@ Resources:
                   - sns:Publish
                   - sns:ListTopics
                   - sns:GetTopicAttributes
+                Resource: !Ref ProfConroyEmailSNS
                 Resource: !Ref ProfConroyEmailSNS
         - PolicyName: LambdaDeletePolicy
           PolicyDocument:
