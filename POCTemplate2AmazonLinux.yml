@@ -6,30 +6,35 @@
 
 # when updated, upload new ver to lambda-store-bucket-poc-2023 !!!!!!
 Resources:
-  MyIAMInstanceProfile:
+  POCIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles: 
         - EC2-Instance-Role-POC-US-WEST-2
 
-  MySecurityGroup:
+
+  POCSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: My EC2 instance security group
+      GroupDescription: EC2 instance security group
       VpcId: vpc-00b9bd3a6d70475f1
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22  # SSH port for instance management
           ToPort: 22
           CidrIp: 10.226.19.192/26
+      Tags:
+        - Key: Name
+          Value: POCProject-UC-WEST-2B
 
-  MyInstance:
+
+  POCInstance:
     Type: AWS::EC2::Instance
     Properties:
       SubnetId: subnet-09c627ce914a28786
-      SecurityGroupIds:
-        - !Ref MySecurityGroup
-      IamInstanceProfile: !Ref MyIAMInstanceProfile
+      SecurityGroupIds: 
+        - !Ref POCSecurityGroup
+      IamInstanceProfile: !Ref POCIAMInstanceProfile
       UserData:
         # use aws s3 cp s3://bucketname/filename /path/to/file to get files from s3 and not github for csv later
         # add credential section for github
@@ -66,4 +71,4 @@ Resources:
       ImageId: ami-04e35eeae7a7c5883
       Tags:
         - Key: Name
-          Value: EC2-Instance-POC-us-west-2b
+          Value: POCProject-UC-WEST-2B
