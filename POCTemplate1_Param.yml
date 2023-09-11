@@ -25,11 +25,6 @@ Parameters:
     Type: String
     Default: csm-match-mock-data-matched
     Description: Name of the output bucket
-    LifecycleConfiguration:
-      Rules:
-        - Id: Retain3Days
-          Status: Enabled
-          ExpirationInDays: 3
 
   EmailSNS:
     Type: String
@@ -478,7 +473,7 @@ Resources:
         Rules:
           - Id: Retain3Days
             Status: Enabled
-            ExpirationInDays: 3
+            ExpirationInDays: 1
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:Put
