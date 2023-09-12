@@ -58,7 +58,7 @@ Resources:
           aws s3 cp "s3://csm-match-mock-data/CSM_Match_Mock_Data_20230720_164351.csv" /tmp
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
-          wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC/main/mockRscript.R
+          wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC/errorhandle/mockRscript.R
           Rscript mockRscript.R 2> /tmp/error.txt || rm error.txt
           csvfilename=$(Rscript mockRscript.R)
           if [ -f "/tmp/$csvfilename" ]; then
