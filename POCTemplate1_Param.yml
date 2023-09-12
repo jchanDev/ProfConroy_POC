@@ -397,6 +397,33 @@ Resources:
           import os
           import boto3
           def lambda_handler(event, context):
+            # delete CloudFormation stack
+            response = cloudformation_client.delete_stack(StackName= "POCTemplate2AmazonLinux")
+            return {
+                'statusCode': 200,
+                'body': 'Stack deletion initiated for POCTemplate2AmazonLinux and SNS message sent'
+            }
+      Handler: index.lambda_handler
+      Role: !GetAtt DeleteLambdaRole.Arn
+      Runtime: python3.11 
+
+  LambdaSNSFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: DeleteLambdaRole
+    Properties:
+      Environment:
+        Variables:
+          OutputBucketName:
+            Ref: OutputBucketName
+          EmailSNS:
+            Ref: ProfConroyEmailSNS
+          # EmailSNS: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${ProfConroyEmailSNS}
+
+      Code:
+        ZipFile: !Sub |
+          import os
+          import boto3
+          def lambda_handler(event, context):
             # send email with link to user
             cloudformation_client = boto3.client('cloudformation')
             sns_client = boto3.client('sns')
@@ -411,21 +438,18 @@ Resources:
               Params={'Bucket': outputBucketName, 'Key': object_key},
               ExpiresIn=expiration_time
             )
-            sns_subject = 'Your output file is ready'
-            sns_message = 'Your output file is ready. Please download it from the following link: ' + presigned_url
+            if object_key == 'error.txt':
+              sns_subject = 'Your output file was not created'
+              sns_message = 'Your output file was not created. Please debug and try again. Download error file here: ' + presigned_url
+            else:
+              sns_subject = 'Your output file was created'
+              sns_message = 'Your output file was created. Please download it from the following link: ' + presigned_url
 
             sns_client.publish(
               TopicArn=emailSNS,
               Subject=sns_subject,
               Message=sns_message
             )
-              
-            # delete CloudFormation stack
-            response = cloudformation_client.delete_stack(StackName= "POCTemplate2AmazonLinux")
-            return {
-                'statusCode': 200,
-                'body': 'Stack deletion initiated for POCTemplate2AmazonLinux and SNS message sent'
-            }
       Handler: index.lambda_handler
       Role: !GetAtt DeleteLambdaRole.Arn
       Runtime: python3.11 
@@ -443,6 +467,15 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !GetAtt LambdaDeleteFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref "AWS::AccountId"
+      SourceArn: "arn:aws:s3:::*"
+
+  LambdaSNSS3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaSNSFunction.Arn
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceAccount: !Ref "AWS::AccountId"
@@ -466,7 +499,9 @@ Resources:
 
   OutputS3BucketPOC2023:
     Type: AWS::S3::Bucket
-    DependsOn: LambdaDeleteS3Permission
+    DependsOn:
+      - LambdaDeleteS3Permission
+      - LambdaSNSS3Permission
     Properties:
       BucketName: !Ref OutputBucketName
       LifecycleConfiguration:
@@ -483,3 +518,7 @@ Resources:
                   - Name: suffix
                     Value: .csv
             Function: !GetAtt LambdaDeleteFunction.Arn
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function: !GetAtt LambdaSNSFunction.Arn

@@ -45,7 +45,8 @@ Resources:
         # spot instances
         # lambda to start run
         # wget https://raw.githubusercontent.com/kpancha1/POC-test-file-R/main/TEST_writecsv.R
-        
+
+        #             echo "Output CSV file did not create. Failed" > filenotfound.txt
         Fn::Base64: !Sub |
           #!/bin/bash -x
           cd /tmp
@@ -58,13 +59,13 @@ Resources:
           secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
           wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC/main/mockRscript.R
+          Rscript mockRscript.R 2> /tmp/error.txt || rm error.txt
           csvfilename=$(Rscript mockRscript.R)
           if [ -f "/tmp/$csvfilename" ]; then
-            echo "CSV file exists in the directory."
+            echo "Output CSV file exists in the directory."
             aws s3 cp /tmp/$csvfilename s3://csm-match-mock-data-matched/
           else
-            echo "File does not exist. Failed" > error.txt
-            aws s3 cp error.txt s3://csm-match-mock-data-matched/
+            aws s3 cp /tmp/error.txt s3://csm-match-mock-data-matched/
           fi
       InstanceType: c5.2xlarge
       AvailabilityZone: us-west-2b
