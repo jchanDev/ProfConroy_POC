@@ -1,5 +1,3 @@
-sink("error.txt", append=TRUE)
-
 #Load the data
 data<-read.csv("CSM_Match_Mock_Data_20230720_164351.csv")
 
@@ -150,7 +148,7 @@ dataMatched<-mateChoice(data)
 path <-"/tmp"
 
 format <-".csv"
-date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
+# date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
 csvfilename <- paste("MockData_", date, ".csv", sep = "")
 file <- file.path(path, csvfilename)
 
@@ -160,5 +158,3 @@ return_csvfilename <- function() {
 return_csvfilename()  
 
 write.csv(dataMatched, file = file, row.names = FALSE)
-
-sink()
