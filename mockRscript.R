@@ -1,3 +1,5 @@
+sink("error.txt", append=TRUE)
+
 #Load the data
 data<-read.csv("CSM_Match_Mock_Data_20230720_164351.csv")
 
@@ -158,3 +160,5 @@ return_csvfilename <- function() {
 return_csvfilename()  
 
 write.csv(dataMatched, file = file, row.names = FALSE)
+
+sink()
