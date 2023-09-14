@@ -16,24 +16,7 @@ nobs<-30*nrow(data)/2
 
 
 #MV calculation#
-mvCalc <- function(ideal, traits) {
-  
-  #ideal is ideal preferences
-  #traits is actual trait values
-  
-  #Calculates Euclidean distance between preferences and traits
-  #Transforms this distance such that positive values are more attractive
-  mv <- apply(traits, 1, function(x)
-    (-1 * (dist(rbind(ideal, x))) +
-      sqrt(10 ^ 2 * 16)) / 
-      sqrt(10 ^ 2 * 16))
-  
-  return(mv)
-  
-}
-
-
-
+mvCalc <- function(ideal, tra
 #Improved Sampling#
 #A sample function that will return a single scalar if given it
 resample <- function(x, ...) {
@@ -54,13 +37,7 @@ mateChoice <- function(data) {
   
   #Break data into females and males
   females <- data[data$sex == 0, ]
-  males <- data[data$sex == 1, ]
-  
-  
-  ###MV Calculation###
-  
-  #Males
-  #Calculate the mate value of each female to each male given starting preferences
+  males <-ach female to each male given starting preferences
   maleMvMatrix <- t(apply(males[, 38:53], 1, function(x)
     mvCalc(x, females[, 54:69])))
   
@@ -76,10 +53,7 @@ mateChoice <- function(data) {
   
   #Generate dataframes to store the number of visits
   investMale <- matrix(1, nrow(males), nrow(females))
-  investFemale <- matrix(1, nrow(females), nrow(males))
-  
-  #Generate matrices to track history of reciprocity
-  recipHistMale <- matrix(1, nrow(males), nrow(females))
+  investFemale <- matrix(1, nrow(females), nrow(malesow(males), nrow(females))
   recipHistFemale <- matrix(1, nrow(females), nrow(males))
   
   #Loop through observation opportunities
@@ -88,15 +62,11 @@ mateChoice <- function(data) {
     fReward <- femaleMvMatrix * recipHistFemale
     
     #Choose the partner with the highest MV, weighted by reciprocity
-    choiceMale <- cbind(1:nrow(males),
-                        apply(mReward, 1, function(x)
-                          resample(which(x == max(
+    choice        resample(which(x == max(
                             x
                           )), 1)))
     
-    choiceFemale <- cbind(1:nrow(females),
-                          apply(fReward, 1, function(x)
-                            resample(which(x == max(
+    choiceFemale <- cbi(which(x == max(
                               x
                             )), 1)))
     
@@ -130,9 +100,9 @@ mateChoice <- function(data) {
   
   #Add chosen mate PINs to the male and female dataframes
   males$mPIN <- females$PIN[mChoice$choice]
-  females$mPIN <- males$PIN[fChoice$choice]
+  females$mPIN <- male
   
-  males$mPIN[mChoice$match == 0] <- NA
+  $match == 0] <- NA
   females$mPIN[fChoice$match == 0] <- NA
   
   #Output the data with matches
@@ -148,7 +118,7 @@ dataMatched<-mateChoice(data)
 path <-"/tmp"
 
 format <-".csv"
-# date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
+date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
 csvfilename <- paste("MockData_", date, ".csv", sep = "")
 file <- file.path(path, csvfilename)
 
