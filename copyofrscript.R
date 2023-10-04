@@ -1,5 +1,7 @@
 #Load the data
-data<-read.csv("human-data/processed-data/CSM-Match-matching-data.csv")
+csv_files <- list.files("human-data/processed-data", pattern = "\\.csv$")
+data <- read.csv(csv_files[1])
+# data<-read.csv("CSM-Match-matching-data.csv")
 
 #Number of Observations#
 #Total number of observation opportunities agents will have in mate search
@@ -218,10 +220,16 @@ mateChoice <- function(data) {
 
 #Timestamp the filename:
 
-path<-"model-outputs/csm-match-human-data-MATCHED-"
+path<-"/tmp"
 
-format<-".csv"
-date<-format(Sys.time(),format="%Y%m%d-%H%M%S")
-file<-file.path(paste0(path,date,format))
+# format<-".csv"
+date<-format(Sys.time(),format="%Y%m%d_%H%M%S")
+csvfilename <- paste("MockData_", date, ".csv", sep = "")
+file <- file.path(path, csvfilename)
+
+return_csvfilename <- function() {
+  return(cat(csvfilename))
+}
+return_csvfilename() 
 
 write.csv(dataMatched,file=file,row.names=F)
