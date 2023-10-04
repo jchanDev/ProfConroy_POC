@@ -1,5 +1,5 @@
 #Load the data
-csv_files <- list.files("human-data/processed-data", pattern = "\\.csv$")
+csv_files <- list.files("/tmp", pattern = "\\.csv$")
 data <- read.csv(csv_files[1])
 # data<-read.csv("CSM-Match-matching-data.csv")
 
