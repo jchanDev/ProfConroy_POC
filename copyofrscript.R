@@ -218,6 +218,8 @@ mateChoice <- function(data) {
   return(rbind(females, males))
 }
 
+dataMatched<-mateChoice(data)
+
 #Timestamp the filename:
 
 path<-"/tmp"
