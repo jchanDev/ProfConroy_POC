@@ -349,7 +349,9 @@ Resources:
       Protocol: email
       TopicArn: !Ref ProfConroyEmailSNS
       - Endpoint: !Ref EmailSNS
+        Protocol: "email"
       - Endpoint: !Ref EmailSNS2
+        Protocol: "email"
   
   # lambda functions
   LambdaLaunchFunction:
