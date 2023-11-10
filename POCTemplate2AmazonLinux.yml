@@ -40,6 +40,10 @@ Resources:
           # secret_string=$(aws secretsmanager get-secret-value --secret-id Julia_Github_Token_Private_Repo --query 'SecretString' --output text --region us-west-2)
           # github_access_token=$(echo $secret_string | jq -r '.JC_Github_Token')
           # wget --header="Authorization: Bearer $github_access_token" \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC/errorhandle/mockRscript.R
+        # objects=$(aws s3 ls s3://csm-match-mock-data/)
+        # most_recent_object=${objects##*}
+        # aws s3 cp $most_recent_object /tmp
+
         Fn::Base64: !Sub |
           #!/bin/bash -x
           cd /tmp
@@ -48,18 +52,19 @@ Resources:
           sudo yum install jq -y
           sudo systemctl start amazon-ssm-agent
           sudo yum install R -y
-          aws s3 cp "s3://csm-match-mock-data/CSM_Match_Mock_Data_20230720_164351.csv" /tmp
-          wget \https://raw.githubusercontent.com/jchanDev/ProfConroy_POC/main/mockRscript.R
-          csvfilename=$(Rscript mockRscript.R)
+          most_recent=$(aws s3api list-objects-v2 --bucket csm-match-mock-data  --region us-west-2 --query 'sort_by(Contents, &LastModified)[-1].Key' --output text)
+          aws s3 cp "s3://csm-match-mock-data/$most_recent" /tmp
+          wget \https://raw.githubusercontent.com/dconroybeam/CSM-Match/main/model-scripts/CSM-Match-matching-script.R
+          csvfilename=$(Rscript CSM-Match-matching-script.R)
 
           if [ -z "$csvfilename" ]; then
-            Rscript mockRscript.R 2> /tmp/error.txt
+            Rscript CSM-Match-matching-script.R 2> /tmp/error.txt
             aws s3 cp /tmp/error.txt s3://csm-match-mock-data-matched/
           elif [ -e "/tmp/$csvfilename" ]; then
             echo "Output CSV file exists in the directory."
             aws s3 cp /tmp/$csvfilename s3://csm-match-mock-data-matched/
           else
-            Rscript mockRscript.R 2> /tmp/error.txt
+            Rscript CSM-Match-matching-script.R 2> /tmp/error.txt
             aws s3 cp /tmp/error.txt s3://csm-match-mock-data-matched/
           fi
       InstanceType: c5.2xlarge

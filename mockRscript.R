@@ -147,7 +147,7 @@ dataMatched<-mateChoice(data)
 
 path <-"/tmp"
 
-format <-".csv"
+# format <-".csv"
 date <- format(Sys.time(),format="%Y%m%d_%H%M%S")
 csvfilename <- paste("MockData_", date, ".csv", sep = "")
 file <- file.path(path, csvfilename)

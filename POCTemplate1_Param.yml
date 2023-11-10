@@ -28,7 +28,7 @@ Parameters:
 
   EmailSNS:
     Type: String
-    Default: jchan975@ucsb.edu
+    Default: jchan@ucsb.edu
     Description: Email address to send SNS notifications to
 
 Resources:
@@ -495,6 +495,8 @@ Resources:
     DependsOn: LambdaLaunchS3Permission
     Properties:
         BucketName: !Ref InputBucketName
+        # ObjectLockConfiguration:
+        #   ObjectLockEnabled: Governance
         NotificationConfiguration:
           LambdaConfigurations:
             - Event: s3:ObjectCreated:*

@@ -1,7 +1,7 @@
 #Load the data
 csv_files <- list.files("/tmp", pattern = "\\.csv$")
 data <- read.csv(csv_files[1])
-# data<-read.csv("CSM-Match-matching-data.csv")
+  # alternatively: data<-read.csv("CSM-Match-matching-data.csv")
 
 #Number of Observations#
 #Total number of observation opportunities agents will have in mate search
