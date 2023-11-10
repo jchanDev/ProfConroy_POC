@@ -30,6 +30,11 @@ Parameters:
     Type: String
     Default: jchan975@ucsb.edu
     Description: Email address to send SNS notifications to
+  
+  EmailSNS2:
+    Type: String
+    Default: kpanchal@ucsb.edu
+    Description: Email address to send SNS notifications to
 
 Resources:
   # Bucket policies and IAM roles
@@ -343,7 +348,8 @@ Resources:
     Properties:
       Protocol: email
       TopicArn: !Ref ProfConroyEmailSNS
-      Endpoint: !Ref EmailSNS
+      - Endpoint: !Ref EmailSNS
+      - Endpoint: !Ref EmailSNS2
   
   # lambda functions
   LambdaLaunchFunction:
